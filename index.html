@@ -2,10 +2,46 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BillAPP - 智慧分帳</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <meta name="apple-mobile-web-app-title" content="BillAPP">
+    
+    <title>BillAPP</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>BillAPP 專案啟動！</h1>
+    <div class="app-container">
+        <header>
+            <h1 class="brand-title">BillAPP</h1>
+            <p class="brand-subtitle">Smart Splitter</p>
+        </header>
+
+        <main class="feature-selector">
+            <button class="feature-card" id="btn-meal">
+                <div class="icon-container">
+                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4v16M11 4C7.134 4 4 7.134 4 11v1M11 4c3.866 0 7 3.134 7 7v1M4 12h14M11 20H4M18 12v8M18 20h-7"></path>
+                    </svg>
+                </div>
+                <h2>Meal Split</h2>
+                <span class="card-desc">Tips & Receipts</span>
+            </button>
+
+            <button class="feature-card" id="btn-travel">
+                <div class="icon-container">
+                    <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="8" width="16" height="12" rx="2" ry="2"></rect>
+                        <path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M8 12h8M8 16h8"></path>
+                    </svg>
+                </div>
+                <h2>Travel Split</h2>
+                <span class="card-desc">Group Expenses</span>
+            </button>
+        </main>
+    </div>
 </body>
 </html>
