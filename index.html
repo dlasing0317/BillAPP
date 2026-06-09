@@ -1,84 +1,92 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BillAPP">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
-    
     <title>BillAPP</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
-    <div class="bubble b-blue"></div>
-    <div class="bubble b-yellow"></div>
-    <div class="bubble b-pink"></div>
-    <div class="bubble b-green"></div>
-    <div class="bubble b-purple"></div>
-
     <div class="app-container">
-        
-        <div class="scanner-section">
-            <h2 class="section-title">掃描收據</h2>
+        <header class="top-bar">
+            <button class="icon-btn" id="btn-back">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <h1 class="page-title">Assign Items</h1>
             
-            <div class="viewfinder">
-                <div class="viewfinder-corners"></div>
-                <div class="receipt-icon">🧾</div>
-                <div class="scan-line"></div>
-            </div>
+            <button class="icon-btn" onclick="document.getElementById('camera-input').click()">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </button>
+            <input type="file" accept="image/*" capture="environment" id="camera-input" style="display: none;">
+        </header>
 
-            <button class="snap-btn" id="btn-snap">
-                <div class="rainbow-plus">+</div>
-                <span class="snap-text">拍一張</span>
+        <div class="avatar-section">
+            <div class="avatar-item">
+                <div class="avatar-circle pink">👩🏻</div>
+                <span class="avatar-name pink-text">Emma</span>
+            </div>
+            <div class="avatar-item">
+                <div class="avatar-circle blue">🧑🏻‍🦱</div>
+                <span class="avatar-name blue-text">Jake</span>
+            </div>
+            <div class="avatar-item">
+                <div class="avatar-circle purple">👧🏻</div>
+                <span class="avatar-name purple-text">Mia</span>
+            </div>
+            <div class="avatar-item">
+                <div class="avatar-circle green">👨🏿‍</div>
+                <span class="avatar-name green-text">Leo</span>
+            </div>
+        </div>
+
+        <div class="item-card">
+            <div class="card-content">
+                <h2 class="item-title">
+                    Bill Summary 
+                    <span id="loading-indicator" style="display:none; font-size:0.8rem; color:#4a90e2; margin-left: 10px;">(掃描辨識中...)</span>
+                </h2>
+                <div class="input-row">
+                    <label>Subtotal</label>
+                    <input type="number" id="subtotal" placeholder="$0.00" class="price-input">
+                </div>
+                <div class="input-row">
+                    <label>Tax</label>
+                    <input type="number" id="tax" placeholder="$0.00" class="price-input">
+                </div>
+                <p class="item-desc">點擊右上角的相機圖示來掃描實體收據。</p>
+
+                <div class="debug-section" style="margin-top: 15px;">
+                    <p style="font-size: 0.8rem; color: #888; margin-bottom: 5px; font-weight: bold;">🔍 OCR 原始辨識結果 (除錯用)：</p>
+                    <textarea id="ocr-debug-text" rows="5" style="width: 100%; font-size: 0.8rem; padding: 8px; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; color: #333;" readonly placeholder="等待掃描結果..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="assign-header">
+            <h3>Assign to</h3>
+            <button class="split-evenly-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l3-3 3 3M6 3v18M15 6l3-3 3 3M18 3v18M6 14h12"></path></svg>
+                Split evenly
             </button>
         </div>
 
-        <div class="control-section">
-            <h3 class="control-title">貼士%</h3>
-            
-            <div class="slider-wrapper">
-                <span class="emoji">😡</span>
-                <div class="slider-container">
-                    <input type="range" min="5" max="25" step="5" value="15" id="tip-slider">
-                    <div class="slider-labels">
-                        <span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span>
-                    </div>
-                </div>
-                <span class="emoji">🤩</span>
-            </div>
-
-            <h3 class="control-title mt-4">人數</h3>
-            <div class="counter-pill">
-                <button class="circle-btn" id="btn-minus">−</button>
-                <span class="count-value" id="split-count">4</span>
-                <button class="circle-btn" id="btn-plus">+</button>
-            </div>
+        <div class="assign-grid">
+            <div class="assign-btn bg-pink"><div class="icon">👤</div><div class="name">Emma</div><div class="amount">$0.00</div></div>
+            <div class="assign-btn bg-blue"><div class="icon">👤</div><div class="name">Jake</div><div class="amount">$0.00</div></div>
+            <div class="assign-btn bg-purple"><div class="icon">👤</div><div class="name">Mia</div><div class="amount">$0.00</div></div>
+            <div class="assign-btn bg-green"><div class="icon">👤</div><div class="name">Leo</div><div class="amount">$0.00</div></div>
         </div>
 
-        <div class="result-section">
-            <p class="result-label">每人應付:</p>
-            <h1 class="result-amount" id="per-person-amount">$23.50</h1>
-            
-            <div class="action-row">
-                <button class="action-btn" id="btn-share">
-                    <div class="action-icon share-icon">↪️</div> <span>分享</span>
-                </button>
-                <button class="action-btn" id="btn-done">
-                    <div class="action-icon done-icon">✔️</div> <span>完成</span>
-                </button>
-            </div>
-        </div>
+        <button class="continue-btn">
+            Continue
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
 
     </div>
-
-    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;">
-
     <script src="app.js"></script>
 </body>
 </html>
