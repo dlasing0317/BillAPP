@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="BillAPP">
@@ -12,7 +11,6 @@
     
     <title>BillAPP</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
@@ -78,6 +76,18 @@
     </div>
 
     <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;">
+
+    <div id="custom-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-icon" id="modal-icon">✅</div>
+            <h3 class="modal-title" id="modal-title">掃描成功！</h3>
+            
+            <div class="modal-content" id="modal-content">
+                </div>
+            
+            <button class="modal-close-btn" id="modal-close-btn">確認</button>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>

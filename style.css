@@ -36,17 +36,7 @@ body {
 
 /* 掃描區塊 */
 .scanner-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-top: 10px;
-}
-
-.camera-icon-wrapper {
-    background: #007aff; color: white; width: 60px; height: 60px;
-    border-radius: 50%; display: flex; justify-content: center; align-items: center;
-    font-size: 30px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
+    display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 10px;
 }
 
 .section-title, .control-title {
@@ -80,7 +70,7 @@ body {
 }
 .snap-text { color: #4a86e8; font-weight: 700; font-size: 1.1rem; }
 
-/* 控制區塊 (貼士 & 人數) */
+/* 控制區塊 */
 .control-section {
     width: 100%; background: rgba(255, 255, 255, 0.5); border-radius: 24px;
     padding: 20px; display: flex; flex-direction: column; align-items: center;
@@ -103,9 +93,7 @@ input[type="range"]::-webkit-slider-thumb {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.slider-labels {
-    display: flex; justify-content: space-between; font-size: 0.75rem; color: #555; font-weight: 600;
-}
+.slider-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #555; font-weight: 600; }
 
 .mt-4 { margin-top: 20px; }
 .counter-pill {
@@ -118,8 +106,11 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .count-value { font-size: 1.5rem; font-weight: 700; color: #4a86e8; width: 30px; text-align: center; }
 
-/* 底部結果與按鈕 */
-.result-section { width: 100%; background: white; border-radius: 30px; padding: 25px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; }
+/* 底部結果 */
+.result-section {
+    width: 100%; background: white; border-radius: 30px; padding: 25px 20px; 
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; 
+}
 .result-label { font-size: 1rem; color: #555; font-weight: 600; margin-bottom: 5px; }
 .result-amount { font-size: 2.8rem; color: #007aff; font-weight: 800; margin-bottom: 20px; }
 
@@ -130,3 +121,53 @@ input[type="range"]::-webkit-slider-thumb {
     gap: 8px; font-size: 1.1rem; font-weight: 700; color: #333; cursor: pointer;
 }
 .share-icon, .done-icon { font-size: 1.2rem; }
+
+/* ==========================================
+   🌟 全新客製化彈跳視窗 (Modal) 樣式 🌟
+========================================== */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+    background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); /* 完美的背景模糊 */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; opacity: 1; transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden { display: none; opacity: 0; }
+
+.modal-card {
+    background: white; width: 85%; max-width: 340px;
+    border-radius: 32px; padding: 35px 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-icon { font-size: 60px; margin-bottom: 10px; }
+.modal-title { font-size: 1.6rem; color: #333; font-weight: 800; margin-bottom: 20px; }
+
+.modal-content { width: 100%; margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
+
+/* 專為金額設計的「超大置中字體」排版 */
+.modal-amount-row {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #f4f7fb; padding: 20px; border-radius: 24px;
+}
+.modal-amount-label { font-size: 1rem; color: #666; font-weight: 700; margin-bottom: 5px; }
+.modal-amount-value { font-size: 2.5rem; color: #007aff; font-weight: 800; } /* 超大字體 */
+
+.modal-text { font-size: 1.1rem; color: #555; line-height: 1.5; font-weight: 500; }
+
+/* 完美置中、匹配彩虹漸層主題的確認按鈕 */
+.modal-close-btn {
+    background: linear-gradient(45deg, #ff3b30, #ff9500, #4cd964, #5ac8fa, #007aff, #5856d6);
+    color: white; border: none; border-radius: 30px;
+    padding: 16px 0; font-size: 1.2rem; font-weight: 800;
+    cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    width: 80%; display: block; margin: 0 auto; transition: transform 0.1s;
+}
+.modal-close-btn:active { transform: scale(0.95); }

@@ -7,14 +7,48 @@ const perPersonAmountDisplay = document.getElementById('per-person-amount');
 const btnShare = document.getElementById('btn-share');
 const btnDone = document.getElementById('btn-done');
 
-// 相機與 OCR 相關元素
+// 綁定 Modal 元素
+const customModal = document.getElementById('custom-modal');
+const modalIcon = document.getElementById('modal-icon');
+const modalTitle = document.getElementById('modal-title');
+const modalContent = document.getElementById('modal-content');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+
+// 相機與 OCR 元素
 const btnSnap = document.getElementById('btn-snap');
 const cameraInput = document.getElementById('camera-input');
 
-// 初始預設金額
 let scannedSubtotal = 0.00; 
 let scannedTax = 0.00;       
 let currentSplitCount = 4;   
+
+// --- 🌟 Modal 控制邏輯 ---
+modalCloseBtn.addEventListener('click', () => {
+    customModal.classList.add('hidden');
+});
+
+function showResultModal(subtotal, tax) {
+    modalIcon.textContent = '🧾';
+    modalTitle.textContent = '掃描成功';
+    modalContent.innerHTML = `
+        <div class="modal-amount-row">
+            <span class="modal-amount-label">稅前總計 (Subtotal)</span>
+            <span class="modal-amount-value">$${subtotal}</span>
+        </div>
+        <div class="modal-amount-row">
+            <span class="modal-amount-label">精準稅金 (Tax)</span>
+            <span class="modal-amount-value">$${tax}</span>
+        </div>
+    `;
+    customModal.classList.remove('hidden');
+}
+
+function showErrorModal(message) {
+    modalIcon.textContent = '⚠️';
+    modalTitle.textContent = '掃描提示';
+    modalContent.innerHTML = `<p class="modal-text">${message}</p>`;
+    customModal.classList.remove('hidden');
+}
 
 // 計算與更新畫面邏輯
 function calculateAndRender() {
@@ -31,7 +65,6 @@ function calculateAndRender() {
 }
 
 // --- 相機與 OCR 處理邏輯 ---
-
 btnSnap.addEventListener('click', () => {
     cameraInput.click();
 });
@@ -40,7 +73,6 @@ cameraInput.addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // 顯示讀取中狀態
     const originalBtnHTML = btnSnap.innerHTML;
     btnSnap.innerHTML = '<span class="snap-text" style="color:#007aff;">讀取收據中... ⏳</span>';
     btnSnap.style.pointerEvents = 'none'; 
@@ -48,47 +80,47 @@ cameraInput.addEventListener('change', async (event) => {
     try {
         const result = await Tesseract.recognize(file, 'eng');
         const text = result.data.text;
-        
-        // 🌟 已經除錯完畢，把這行註解掉，就不會每次都彈出一大堆字了
-        // alert("🚨 AI 實際看到的文字是：\n\n" + text);
 
-        // 🌟 全新升級版 Regex：支援更多收據單字 (如 Taxable value, Surtax)，且不強制要求小數點
         const subtotalMatch = text.match(/(?:subtotal|taxable value|net)[^\d]*([\d,]+(?:\.\d{1,2})?)/i);
         const taxMatch = text.match(/(?:surtax|\btax\b|vat)[^\d]*([\d,]+(?:\.\d{1,2})?)/i);
         const totalMatch = text.match(/(?:total amount|\btotal\b)[^\d]*([\d,]+(?:\.\d{1,2})?)/i);
 
-        // 每次掃描前先歸零
-        scannedSubtotal = 0;
-        scannedTax = 0;
+        let parsedSubtotal = 0;
+        let parsedTax = 0;
+        let parsedTotal = 0;
 
-        // 抓取 Subtotal 或 Total
-        if (subtotalMatch) {
-            scannedSubtotal = parseFloat(subtotalMatch[1].replace(',', ''));
-        } else if (totalMatch) {
-            scannedSubtotal = parseFloat(totalMatch[1].replace(',', ''));
+        if (subtotalMatch) parsedSubtotal = parseFloat(subtotalMatch[1].replace(',', ''));
+        if (taxMatch) parsedTax = parseFloat(taxMatch[1].replace(',', ''));
+        if (totalMatch) parsedTotal = parseFloat(totalMatch[1].replace(',', ''));
+
+        // 🌟 數學防呆校正邏輯：精準計算稅金 🌟
+        if (parsedTotal > 0 && parsedSubtotal > 0) {
+            scannedSubtotal = parsedSubtotal;
+            scannedTax = parsedTotal - parsedSubtotal; // 總計減去稅前，無視錯字
+        } else if (parsedSubtotal > 0) {
+            scannedSubtotal = parsedSubtotal;
+            scannedTax = parsedTax;
+        } else if (parsedTotal > 0) {
+            scannedSubtotal = parsedTotal;
+            scannedTax = 0;
+        } else {
+            scannedSubtotal = 0;
+            scannedTax = 0;
         }
 
-        // 抓取 Tax
-        if (taxMatch) {
-            scannedTax = parseFloat(taxMatch[1].replace(',', ''));
-        }
-
-        // 驗證是否成功抓到數字並更新畫面
         if (scannedSubtotal > 0) {
-            alert(`✅ 掃描成功！\n稅前總計: $${scannedSubtotal}\n稅金: $${scannedTax}`);
+            // 呼叫超美客製化 Modal
+            showResultModal(scannedSubtotal, scannedTax);
             calculateAndRender();
         } else {
-            alert('⚠️ 找不到收據上的金額，請確保照片清晰或手動輸入。');
+            showErrorModal('找不到收據上的金額，請確保照片清晰或手動輸入。');
         }
 
     } catch (error) {
-        console.error("OCR 錯誤:", error);
-        alert('❌ 圖片辨識失敗，請重試。');
+        showErrorModal('圖片辨識失敗，請重試。');
     } finally {
-        // 恢復按鈕原本的樣子
         btnSnap.innerHTML = originalBtnHTML;
         btnSnap.style.pointerEvents = 'auto';
-        // 清空 input，確保下次拍同一張照片也能觸發 change 事件
         cameraInput.value = ''; 
     }
 });
@@ -110,9 +142,7 @@ btnPlus.addEventListener('click', () => {
     calculateAndRender();
 });
 
-// 初始化畫面數字
 calculateAndRender();
 
-// 預留後續功能
-btnShare.addEventListener('click', async () => { alert('即將加入分享功能！'); });
-btnDone.addEventListener('click', () => { alert('分帳完成！'); });
+btnShare.addEventListener('click', () => { showErrorModal('即將加入分享功能！'); });
+btnDone.addEventListener('click', () => { showResultModal(scannedSubtotal, scannedTax); });
