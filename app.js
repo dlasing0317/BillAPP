@@ -1,8 +1,154 @@
+// 綁定 UI 元素
+const tipSlider = document.getElementById('tip-slider');
+const btnMinus = document.getElementById('btn-minus');
+const btnPlus = document.getElementById('btn-plus');
+const splitCountDisplay = document.getElementById('split-count');
+const perPersonAmountDisplay = document.getElementById('per-person-amount');
+const btnShare = document.getElementById('btn-share');
+const btnDone = document.getElementById('btn-done');
+
+// Modal 元素
+const customModal = document.getElementById('custom-modal');
+const modalIcon = document.getElementById('modal-icon');
+const modalTitle = document.getElementById('modal-title');
+const modalContent = document.getElementById('modal-content');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+
+// 相機與 OCR 元素
+const btnSnap = document.getElementById('btn-snap');
+const cameraInput = document.getElementById('camera-input');
+
+// 裁切 UI 元素
+const cropModal = document.getElementById('crop-modal');
+const cropImage = document.getElementById('crop-image');
+const btnCropCancel = document.getElementById('btn-crop-cancel');
+const btnCropConfirm = document.getElementById('btn-crop-confirm');
+let cropper = null; 
+
+// 滑動與手動輸入 UI 元素
+const swipeContainer = document.getElementById('swipe-container');
+const dot1 = document.getElementById('dot-1');
+const dot2 = document.getElementById('dot-2');
+const btnManualUpdate = document.getElementById('btn-manual-update');
+const manualSubtotalInput = document.getElementById('manual-subtotal');
+const manualTaxInput = document.getElementById('manual-tax');
+
+// 初始狀態
+let scannedSubtotal = 0.00; 
+let scannedTax = 0.00;       
+let currentSplitCount = 4;   
+
+// --- UI 控制邏輯 ---
+modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
+btnCropCancel.addEventListener('click', () => {
+    cropModal.classList.add('hidden');
+    if (cropper) cropper.destroy();
+    cameraInput.value = ''; 
+});
+
+function showDebugAndResultModal(subtotal, tax, debugText) {
+    modalIcon.textContent = '🧾';
+    modalTitle.textContent = '掃描結果與分析';
+    modalContent.innerHTML = `
+        <div class="modal-amount-row" style="padding: 10px;">
+            <span class="modal-amount-label">稅前總計</span>
+            <span class="modal-amount-value" style="font-size: 2rem;">$${subtotal}</span>
+        </div>
+        <div class="modal-amount-row" style="padding: 10px; margin-bottom: 15px;">
+            <span class="modal-amount-label">精準稅金</span>
+            <span class="modal-amount-value" style="font-size: 2rem;">$${tax}</span>
+        </div>
+        <div style="text-align: left; background: #f4f7fb; border-radius: 12px; padding: 15px; max-height: 200px; overflow-y: auto; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
+            <p style="font-size: 0.8rem; font-weight: 700; color: #888; margin-bottom: 8px;">🛠️ X光大腦分析報告：</p>
+            <pre style="font-size: 0.75rem; color: #555; white-space: pre-wrap; font-family: monospace; line-height: 1.4; user-select: text; -webkit-user-select: text;">${debugText}</pre>
+        </div>
+    `;
+    customModal.classList.remove('hidden');
+}
+
+function showErrorModal(message) {
+    modalIcon.textContent = '⚠️';
+    modalTitle.textContent = '掃描提示';
+    modalContent.innerHTML = `<p class="modal-text">${message}</p>`;
+    customModal.classList.remove('hidden');
+}
+
+function calculateAndRender() {
+    const tipPercentage = parseInt(tipSlider.value); 
+    const tipAmount = scannedSubtotal * (tipPercentage / 100);
+    const grandTotal = scannedSubtotal + scannedTax + tipAmount;
+    const perPerson = grandTotal / currentSplitCount;
+
+    perPersonAmountDisplay.textContent = grandTotal === 0 ? `$0.00` : `$${perPerson.toFixed(2)}`;
+}
+
+// --- 手動輸入與滑動分頁邏輯 ---
+swipeContainer.addEventListener('scroll', () => {
+    const scrollPos = swipeContainer.scrollLeft;
+    const halfWidth = swipeContainer.clientWidth / 2;
+    
+    if (scrollPos > halfWidth) {
+        dot1.classList.remove('active');
+        dot2.classList.add('active');
+    } else {
+        dot1.classList.add('active');
+        dot2.classList.remove('active');
+    }
+});
+
+btnManualUpdate.addEventListener('click', () => {
+    const sub = parseFloat(manualSubtotalInput.value) || 0;
+    const tax = parseFloat(manualTaxInput.value) || 0;
+    
+    if (sub === 0 && tax === 0) {
+        showErrorModal('請輸入有效的金額！');
+        return;
+    }
+    
+    scannedSubtotal = sub;
+    scannedTax = tax;
+    calculateAndRender();
+    
+    modalIcon.textContent = '✍️';
+    modalTitle.textContent = '手動輸入成功';
+    modalContent.innerHTML = `<p class="modal-text">金額已更新，將為您重新計算每人應付金額。</p>`;
+    customModal.classList.remove('hidden');
+});
+
+// --- 拍照與裁切流程 ---
+btnSnap.addEventListener('click', () => cameraInput.click());
+
+cameraInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        cropImage.src = e.target.result;
+        cropModal.classList.remove('hidden');
+        
+        if (cropper) cropper.destroy();
+        cropper = new Cropper(cropImage, {
+            viewMode: 1,
+            dragMode: 'crop',
+            autoCropArea: 0.8,
+            restore: false,
+            guides: true,
+            center: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
+        });
+    };
+    reader.readAsDataURL(file);
+});
+
 // --- 執行 OCR 與三大引擎分析 ---
 btnCropConfirm.addEventListener('click', async () => {
     if (!cropper) return;
 
-    // 🌟 關鍵修復：限制輸出解析度，防止 iOS 記憶體崩潰產生破圖！
+    // 限制圖片寬高，防止 iOS 記憶體崩潰
     cropper.getCroppedCanvas({
         maxWidth: 1024,
         maxHeight: 1024
@@ -10,28 +156,20 @@ btnCropConfirm.addEventListener('click', async () => {
         cropModal.classList.add('hidden');
         cropper.destroy();
         
-        const originalBtnText = snapText.textContent;
-        snapText.textContent = '大腦分析中... ⏳';
+        btnSnap.textContent = '⏳';
         btnSnap.style.pointerEvents = 'none';
 
         try {
             const result = await Tesseract.recognize(blob, 'eng');
             const rawText = result.data.text;
 
-            // ==========================================
-            // 🌟 魔法淨化器 (Text Sanitization)
-            // ==========================================
+            // 🌟 魔法淨化器
             let cleanText = rawText;
-            
-            // 1. 修復斷裂的小數點 (把 "3. 84" 或 "42 _ 33" 縫合為 "3.84"、"42.33")
             cleanText = cleanText.replace(/(\d+)\s*[_\.,]\s*(\d+)/g, "$1.$2");
-            
-            // 2. 徹底抹除帶有 % 的數字 (把 "10.0%" 刪掉，避免 Regex 抓錯)
             cleanText = cleanText.replace(/\d+(?:\.\d+)?\s*%/g, "");
 
             let debugMsg = "=== 👁️ 淨化後的 AI 視力測驗 ===\n" + cleanText + "\n====================\n\n";
 
-            // 使用淨化後的乾淨文字進行後續所有的分析
             const allAmounts = [...cleanText.matchAll(/\b\d{1,4}(?:,\d{3})*\.\d{2}\b/g)]
                 .map(m => parseFloat(m[0].replace(',', '')))
                 .sort((a, b) => b - a);
@@ -40,7 +178,7 @@ btnCropConfirm.addEventListener('click', async () => {
 
             let finalSub = 0, finalTax = 0, finalTotal = 0;
 
-            // 🚀 引擎 A：餐點明細加總法 
+            // 🚀 引擎 A：餐點明細加總法
             const splitMatch = cleanText.match(/subtotal|taxable value|net|surtax|\btax\b|vat|total amount|\btotal\b/i);
             if (splitMatch && allAmounts.length > 0) {
                 const upperText = cleanText.substring(0, splitMatch.index);
@@ -72,7 +210,7 @@ btnCropConfirm.addEventListener('click', async () => {
                     }
                     if (finalTotal) break;
                 }
-                if (finalTotal) debugMsg += `✅ 引擎 B 成功 (完美配對: ${finalSub} + ${finalTax} = ${finalTotal})！\n\n`;
+                if (finalTotal) debugMsg += `✅ 引擎 B 成功 (完美配對)！\n\n`;
             }
 
             // 🛡️ 引擎 C：嚴格同行 Regex 文字鎖定
@@ -107,6 +245,11 @@ btnCropConfirm.addEventListener('click', async () => {
             if (scannedSubtotal > 0 || finalTotal > 0) {
                 if (scannedSubtotal === 0 && finalTotal > 0) scannedSubtotal = finalTotal;
                 showDebugAndResultModal(scannedSubtotal.toFixed(2), scannedTax.toFixed(2), debugMsg);
+                
+                // 將掃描到的結果自動填入手動輸入框
+                manualSubtotalInput.value = scannedSubtotal.toFixed(2);
+                manualTaxInput.value = scannedTax.toFixed(2);
+                
                 calculateAndRender();
             } else {
                 showDebugAndResultModal("0.00", "0.00", "❌ 找不到任何金額。\n\n" + debugMsg);
@@ -116,9 +259,31 @@ btnCropConfirm.addEventListener('click', async () => {
             console.error("OCR Error:", error);
             showErrorModal('圖片辨識失敗，請重試。');
         } finally {
-            snapText.textContent = '拍一張';
+            btnSnap.textContent = '📷';
             btnSnap.style.pointerEvents = 'auto';
             cameraInput.value = ''; 
         }
     }, 'image/jpeg');
 });
+
+// --- 事件監聽器 ---
+tipSlider.addEventListener('input', calculateAndRender);
+
+btnMinus.addEventListener('click', () => {
+    if (currentSplitCount > 1) {
+        currentSplitCount--;
+        splitCountDisplay.textContent = currentSplitCount;
+        calculateAndRender();
+    }
+});
+
+btnPlus.addEventListener('click', () => {
+    currentSplitCount++;
+    splitCountDisplay.textContent = currentSplitCount;
+    calculateAndRender();
+});
+
+calculateAndRender();
+
+btnShare.addEventListener('click', () => { showErrorModal('即將加入分享功能！'); });
+btnDone.addEventListener('click', () => { customModal.classList.add('hidden'); });
