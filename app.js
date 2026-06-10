@@ -1,114 +1,12 @@
-// 綁定 UI 元素
-const tipSlider = document.getElementById('tip-slider');
-const btnMinus = document.getElementById('btn-minus');
-const btnPlus = document.getElementById('btn-plus');
-const splitCountDisplay = document.getElementById('split-count');
-const perPersonAmountDisplay = document.getElementById('per-person-amount');
-const btnShare = document.getElementById('btn-share');
-const btnDone = document.getElementById('btn-done');
-
-// Modal 元素
-const customModal = document.getElementById('custom-modal');
-const modalIcon = document.getElementById('modal-icon');
-const modalTitle = document.getElementById('modal-title');
-const modalContent = document.getElementById('modal-content');
-const modalCloseBtn = document.getElementById('modal-close-btn');
-
-// 相機與 OCR 元素
-const btnSnap = document.getElementById('btn-snap');
-const snapText = document.getElementById('snap-text');
-const cameraInput = document.getElementById('camera-input');
-
-// 裁切 UI 元素
-const cropModal = document.getElementById('crop-modal');
-const cropImage = document.getElementById('crop-image');
-const btnCropCancel = document.getElementById('btn-crop-cancel');
-const btnCropConfirm = document.getElementById('btn-crop-confirm');
-let cropper = null; 
-
-// 初始狀態
-let scannedSubtotal = 0.00; 
-let scannedTax = 0.00;       
-let currentSplitCount = 4;   
-
-// --- UI 控制邏輯 ---
-modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
-btnCropCancel.addEventListener('click', () => {
-    cropModal.classList.add('hidden');
-    if (cropper) cropper.destroy();
-    cameraInput.value = ''; 
-});
-
-function showDebugAndResultModal(subtotal, tax, debugText) {
-    modalIcon.textContent = '🧾';
-    modalTitle.textContent = '掃描結果與分析';
-    modalContent.innerHTML = `
-        <div class="modal-amount-row" style="padding: 10px;">
-            <span class="modal-amount-label">稅前總計</span>
-            <span class="modal-amount-value" style="font-size: 2rem;">$${subtotal}</span>
-        </div>
-        <div class="modal-amount-row" style="padding: 10px; margin-bottom: 15px;">
-            <span class="modal-amount-label">精準稅金</span>
-            <span class="modal-amount-value" style="font-size: 2rem;">$${tax}</span>
-        </div>
-        <div style="text-align: left; background: #f4f7fb; border-radius: 12px; padding: 15px; max-height: 200px; overflow-y: auto; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
-            <p style="font-size: 0.8rem; font-weight: 700; color: #888; margin-bottom: 8px;">🛠️ X光大腦分析報告：</p>
-            <pre style="font-size: 0.75rem; color: #555; white-space: pre-wrap; font-family: monospace; line-height: 1.4; user-select: text; -webkit-user-select: text;">${debugText}</pre>
-        </div>
-    `;
-    customModal.classList.remove('hidden');
-}
-
-function showErrorModal(message) {
-    modalIcon.textContent = '⚠️';
-    modalTitle.textContent = '掃描提示';
-    modalContent.innerHTML = `<p class="modal-text">${message}</p>`;
-    customModal.classList.remove('hidden');
-}
-
-function calculateAndRender() {
-    const tipPercentage = parseInt(tipSlider.value); 
-    const tipAmount = scannedSubtotal * (tipPercentage / 100);
-    const grandTotal = scannedSubtotal + scannedTax + tipAmount;
-    const perPerson = grandTotal / currentSplitCount;
-
-    perPersonAmountDisplay.textContent = grandTotal === 0 ? `$0.00` : `$${perPerson.toFixed(2)}`;
-}
-
-// --- 拍照與裁切流程 ---
-btnSnap.addEventListener('click', () => cameraInput.click());
-
-cameraInput.addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        cropImage.src = e.target.result;
-        cropModal.classList.remove('hidden');
-        
-        if (cropper) cropper.destroy();
-        cropper = new Cropper(cropImage, {
-            viewMode: 1,
-            dragMode: 'crop',
-            autoCropArea: 0.8,
-            restore: false,
-            guides: true,
-            center: true,
-            highlight: false,
-            cropBoxMovable: true,
-            cropBoxResizable: true,
-            toggleDragModeOnDblclick: false,
-        });
-    };
-    reader.readAsDataURL(file);
-});
-
 // --- 執行 OCR 與三大引擎分析 ---
 btnCropConfirm.addEventListener('click', async () => {
     if (!cropper) return;
 
-    cropper.getCroppedCanvas().toBlob(async (blob) => {
+    // 🌟 關鍵修復：限制輸出解析度，防止 iOS 記憶體崩潰產生破圖！
+    cropper.getCroppedCanvas({
+        maxWidth: 1024,
+        maxHeight: 1024
+    }).toBlob(async (blob) => {
         cropModal.classList.add('hidden');
         cropper.destroy();
         
@@ -224,25 +122,3 @@ btnCropConfirm.addEventListener('click', async () => {
         }
     }, 'image/jpeg');
 });
-
-// --- 事件監聽器 ---
-tipSlider.addEventListener('input', calculateAndRender);
-
-btnMinus.addEventListener('click', () => {
-    if (currentSplitCount > 1) {
-        currentSplitCount--;
-        splitCountDisplay.textContent = currentSplitCount;
-        calculateAndRender();
-    }
-});
-
-btnPlus.addEventListener('click', () => {
-    currentSplitCount++;
-    splitCountDisplay.textContent = currentSplitCount;
-    calculateAndRender();
-});
-
-calculateAndRender();
-
-btnShare.addEventListener('click', () => { showErrorModal('即將加入分享功能！'); });
-btnDone.addEventListener('click', () => { customModal.classList.add('hidden'); });
