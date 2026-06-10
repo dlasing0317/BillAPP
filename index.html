@@ -10,8 +10,12 @@
     <link rel="apple-touch-icon" href="icon.png">
     
     <title>BillAPP</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 </head>
 <body>
     <div class="bubble b-blue"></div>
@@ -33,7 +37,7 @@
 
             <button class="snap-btn" id="btn-snap">
                 <div class="rainbow-plus">+</div>
-                <span class="snap-text">拍一張</span>
+                <span class="snap-text" id="snap-text">拍一張</span>
             </button>
         </div>
 
@@ -75,15 +79,24 @@
 
     </div>
 
-    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;">
+    <input type="file" id="camera-input" accept="image/*" style="display: none;">
+
+    <div id="crop-modal" class="modal-overlay hidden" style="background: #000; z-index: 10000;">
+        <div class="crop-container">
+            <img id="crop-image" src="" alt="Cropper">
+        </div>
+        <div class="crop-actions">
+            <button class="crop-btn cancel" id="btn-crop-cancel">取消</button>
+            <button class="crop-btn confirm" id="btn-crop-confirm">✂️ 裁切並分析</button>
+        </div>
+    </div>
 
     <div id="custom-modal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-icon" id="modal-icon">✅</div>
             <h3 class="modal-title" id="modal-title">掃描成功！</h3>
             
-            <div class="modal-content" id="modal-content">
-                </div>
+            <div class="modal-content" id="modal-content"></div>
             
             <button class="modal-close-btn" id="modal-close-btn">確認</button>
         </div>
