@@ -38,7 +38,7 @@ body {
 }
 
 /* ==========================================
-   🌟 全新升級：左右滑動區塊 (Swipe Container)
+   🌟 左右滑動區塊 (Swipe Container)
 ========================================== */
 .scanner-section {
     display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 10px;
@@ -88,15 +88,38 @@ body {
 }
 @keyframes scan { 0% { top: 20%; } 100% { top: 80%; } }
 
-/* 🌟 全新獨立相機按鈕 */
+/* ==========================================
+   🌟 乾淨質感的白色圓角矩形相機按鈕
+========================================== */
 .cam-btn {
-    width: 65px; height: 65px; border-radius: 50%; border: none;
-    background: linear-gradient(135deg, #007aff, #5ac8fa);
-    color: white; font-size: 30px; display: flex; justify-content: center; align-items: center;
-    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.4); z-index: 2; cursor: pointer;
-    transition: transform 0.1s;
+    width: 80%; /* 讓它變成寬版矩形 */
+    max-width: 200px;
+    height: 60px; /* 扁平的矩形高度 */
+    border-radius: 16px; /* 現代感的圓角 */
+    background: #ffffff; /* 絕對乾淨的白色背景 */
+    border: none; /* 移除醜陋的黑邊 */
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06); /* 柔和的高級懸浮陰影 */
+    z-index: 2; 
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    padding: 10px;
 }
-.cam-btn:active { transform: scale(0.9); }
+
+/* 點擊時的輕微下壓回饋 */
+.cam-btn:active { 
+    transform: translateY(2px); 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06); 
+}
+
+/* 讓相機圖標完美塞進矩形中 */
+.cam-icon-img {
+    height: 90%; /* 根據按鈕高度自動縮放 */
+    width: auto;
+    pointer-events: none; /* 防止誤觸圖片 */
+}
 
 /* 🌟 手動輸入分頁樣式 */
 .manual-card {
