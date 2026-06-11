@@ -1,9 +1,4 @@
 // ==========================================
-// ⚙️ 個人付款設定 (請替換成你的 Venmo 帳號，不要加 @)
-// ==========================================
-const VENMO_USERNAME = "YOUR_VENMO_ID"; 
-
-// ==========================================
 // 綁定 UI 元素
 // ==========================================
 const tipSlider = document.getElementById('tip-slider');
@@ -39,6 +34,7 @@ const dot2 = document.getElementById('dot-2');
 const btnManualUpdate = document.getElementById('btn-manual-update');
 const manualSubtotalInput = document.getElementById('manual-subtotal');
 const manualTaxInput = document.getElementById('manual-tax');
+const venmoIdInput = document.getElementById('venmo-id-input'); // 🌟 新增的 Venmo ID 輸入框
 
 // 🌟 全域狀態
 let scannedSubtotal = 0.00; 
@@ -47,6 +43,17 @@ let currentSplitCount = 4;
 let currentGrandTotal = 0.00; 
 let currentPerPerson = 0.00;  
 let lastScannedImageFile = null; 
+
+// 🌟 初始化：從瀏覽器記憶中讀取之前存好的 Venmo ID
+const savedVenmo = localStorage.getItem('billapp_venmo_id');
+if (savedVenmo) {
+    venmoIdInput.value = savedVenmo;
+}
+
+// 🌟 當使用者在框框裡打字時，自動偷偷存進瀏覽器記憶
+venmoIdInput.addEventListener('input', (e) => {
+    localStorage.setItem('billapp_venmo_id', e.target.value.trim());
+});
 
 // --- UI 控制邏輯 ---
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
@@ -110,6 +117,9 @@ btnManualUpdate.addEventListener('click', () => {
     const sub = parseFloat(manualSubtotalInput.value) || 0;
     const tax = parseFloat(manualTaxInput.value) || 0;
     
+    // 點擊更新時，也確保最新的 Venmo ID 有被存下來
+    localStorage.setItem('billapp_venmo_id', venmoIdInput.value.trim());
+
     if (sub === 0 && tax === 0) {
         showErrorModal('請輸入有效的金額！');
         return;
@@ -122,7 +132,7 @@ btnManualUpdate.addEventListener('click', () => {
     
     modalIcon.textContent = '✍️';
     modalTitle.textContent = '手動輸入成功';
-    modalContent.innerHTML = `<p class="modal-text">金額已更新，將為您重新計算每人應付金額。</p>`;
+    modalContent.innerHTML = `<p class="modal-text">金額與設定已更新，將為您重新計算每人應付金額。</p>`;
     customModal.classList.remove('hidden');
 });
 
@@ -291,7 +301,7 @@ btnPlus.addEventListener('click', () => {
     calculateAndRender();
 });
 
-// 🌟 整合 Venmo 付款連結的分享功能
+// 🌟 整合動態 Venmo 付款連結的分享功能
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
         showErrorModal('目前還沒有帳單資料可以分享喔！');
@@ -301,8 +311,15 @@ btnShare.addEventListener('click', async () => {
     const tipPercentage = parseInt(tipSlider.value); 
     const tipAmount = (scannedSubtotal * (tipPercentage / 100)).toFixed(2);
     
-    // 產生專屬 Venmo 一鍵付款連結
-    const venmoLink = `https://venmo.com/?tx=pay&recipients=${VENMO_USERNAME}&amount=${currentPerPerson.toFixed(2)}&note=Dinner%20Bill`;
+    // 從輸入框即時抓取使用者設定的 Venmo 帳號
+    const currentVenmoId = venmoIdInput.value.trim();
+    let venmoText = "";
+
+    // 如果使用者有輸入 Venmo 帳號，才加入收款連結
+    if (currentVenmoId) {
+        const venmoLink = `https://venmo.com/?tx=pay&recipients=${currentVenmoId}&amount=${currentPerPerson.toFixed(2)}&note=Dinner%20Bill`;
+        venmoText = `\n💸 點擊下方連結使用 Venmo 快速付款：\n${venmoLink}\n`;
+    }
 
     const shareTitle = '🧾 BillApp 帳單分享';
     const shareText = 
@@ -315,10 +332,7 @@ btnShare.addEventListener('click', async () => {
 
 👥 分攤人數: ${currentSplitCount} 人
 👉 每人應付: $${currentPerPerson.toFixed(2)}
-
-💸 點擊下方連結使用 Venmo 快速付款：
-${venmoLink}
-
+${venmoText}
 (由 BillApp 自動計算 🤖)`;
 
     const shareData = {

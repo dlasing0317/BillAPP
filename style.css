@@ -1,5 +1,5 @@
 /* ==========================================
-   全局設定與背景 (🌟 已加入 iOS 防偏移機制)
+   全局設定與背景
 ========================================== */
 * {
     box-sizing: border-box;
@@ -15,12 +15,11 @@ html, body {
     color: #333;
     width: 100%;
     height: 100dvh;
-    overflow-x: hidden; /* 絕對禁止橫向滾動，防止偏移 */
+    overflow-x: hidden; 
     position: relative;
-    -webkit-text-size-adjust: 100%; /* 防止螢幕旋轉時字體縮放 */
+    -webkit-text-size-adjust: 100%; 
 }
 
-/* 背景氣泡 */
 .bubble { position: absolute; border-radius: 50%; opacity: 0.6; z-index: -1; filter: blur(8px); }
 .b-blue { width: 150px; height: 150px; background: #a8dfff; top: -20px; left: -30px; }
 .b-yellow { width: 200px; height: 200px; background: #ffeba8; top: 10%; right: -50px; }
@@ -43,7 +42,7 @@ html, body {
 ========================================== */
 .scanner-section {
     display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 10px;
-    overflow: hidden; /* 防止超出畫面 */
+    overflow: hidden; 
 }
 
 .section-header {
@@ -53,15 +52,13 @@ html, body {
     color: #4a86e8; font-size: 1.2rem; font-weight: 700; margin-bottom: 5px;
 }
 
-/* 翻頁小圓點 */
 .swipe-dots { display: flex; gap: 8px; margin-bottom: 10px; }
 .dot { width: 8px; height: 8px; background: #ccc; border-radius: 50%; transition: 0.3s; }
 .dot.active { background: #007aff; transform: scale(1.2); }
 
-/* 滑動軌道 (🌟 已修正寬度 100%) */
 .swipe-container {
     display: flex; 
-    width: 100%; /* 配合父層 padding */
+    width: 100%; 
     overflow-x: auto; 
     scroll-snap-type: x mandatory; 
     scroll-behavior: smooth; 
@@ -70,15 +67,13 @@ html, body {
 }
 .swipe-container::-webkit-scrollbar { display: none; }
 
-/* 每一頁的設定 */
 .swipe-slide {
-    flex: 0 0 100%; /* 每頁佔滿寬度 */
-    scroll-snap-align: start; /* 吸附對齊 */
+    flex: 0 0 100%; 
+    scroll-snap-align: start; 
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
     padding: 10px 0;
 }
 
-/* 原本的掃描框 */
 .viewfinder {
     width: 160px; height: 160px; background: rgba(255, 255, 255, 0.6);
     border-radius: 50%; display: flex; justify-content: center; align-items: center;
@@ -125,7 +120,7 @@ html, body {
 }
 
 /* ==========================================
-   🌟 手動輸入分頁樣式 (🌟 已加入強制 16px 防放大)
+   🌟 手動輸入分頁樣式 
 ========================================== */
 .manual-card {
     width: 90%; background: white; border-radius: 24px; padding: 20px;
@@ -141,12 +136,12 @@ html, body {
     background: #f4f7fb;
     border-radius: 12px; 
     text-align: right; 
-    font-size: 16px !important; /* 強制 16px，防止 iOS 自動放大畫面 */
+    font-size: 16px !important; 
     font-weight: 800; 
     color: #007aff;
     outline: none; 
     transition: 0.2s;
-    -webkit-appearance: none; /* 移除 iOS 預設的內陰影 */
+    -webkit-appearance: none; 
     margin: 0;
 }
 .input-row input:focus { box-shadow: 0 0 0 2px #007aff; }
