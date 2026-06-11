@@ -27,13 +27,12 @@ html, body {
 .b-green { width: 100px; height: 100px; background: #bdfcc9; top: 40%; right: 20%; }
 .b-purple { width: 180px; height: 180px; background: #e0c2ff; bottom: -40px; right: -20px; }
 
-/* 🌟 右上角設定按鈕 (已修正為完美透明背景) */
+/* 🌟 右上角設定按鈕 (透明背景、微透光感) */
 .settings-btn {
     position: absolute;
     top: calc(env(safe-area-inset-top) + 15px);
     right: 20px;
-    font-size: 26px;
-    background: transparent; /* 👈 關鍵修改：將白色背景改為透明 */
+    background: transparent;
     border: none;
     width: 44px;
     height: 44px;
@@ -42,10 +41,12 @@ html, body {
     align-items: center;
     cursor: pointer;
     z-index: 50;
-    transition: transform 0.1s;
+    opacity: 0.8; /* 讓圖標稍微透出一點背景，看起來更柔和 */
+    transition: transform 0.1s, opacity 0.1s;
 }
 .settings-btn:active {
     transform: scale(0.9);
+    opacity: 1; /* 點擊時變亮，增加回饋感 */
 }
 
 .app-container {
