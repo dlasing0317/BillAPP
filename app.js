@@ -37,6 +37,8 @@ const manualTaxInput = document.getElementById('manual-tax');
 let scannedSubtotal = 0.00; 
 let scannedTax = 0.00;       
 let currentSplitCount = 4;   
+let currentGrandTotal = 0.00; // 新增全域變數以供分享功能使用
+let currentPerPerson = 0.00;  // 新增全域變數以供分享功能使用
 
 // --- UI 控制邏輯 ---
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
@@ -76,10 +78,10 @@ function showErrorModal(message) {
 function calculateAndRender() {
     const tipPercentage = parseInt(tipSlider.value); 
     const tipAmount = scannedSubtotal * (tipPercentage / 100);
-    const grandTotal = scannedSubtotal + scannedTax + tipAmount;
-    const perPerson = grandTotal / currentSplitCount;
+    currentGrandTotal = scannedSubtotal + scannedTax + tipAmount; // 儲存至全域變數
+    currentPerPerson = currentGrandTotal / currentSplitCount;     // 儲存至全域變數
 
-    perPersonAmountDisplay.textContent = grandTotal === 0 ? `$0.00` : `$${perPerson.toFixed(2)}`;
+    perPersonAmountDisplay.textContent = currentGrandTotal === 0 ? `$0.00` : `$${currentPerPerson.toFixed(2)}`;
 }
 
 // --- 手動輸入與滑動分頁邏輯 ---
@@ -148,7 +150,6 @@ cameraInput.addEventListener('change', (event) => {
 btnCropConfirm.addEventListener('click', async () => {
     if (!cropper) return;
 
-    // 限制圖片寬高，防止 iOS 記憶體崩潰
     cropper.getCroppedCanvas({
         maxWidth: 1024,
         maxHeight: 1024
@@ -156,14 +157,13 @@ btnCropConfirm.addEventListener('click', async () => {
         cropModal.classList.add('hidden');
         cropper.destroy();
         
-        btnSnap.textContent = '⏳';
+        btnSnap.innerHTML = '<span style="font-size: 28px;">⏳</span>';
         btnSnap.style.pointerEvents = 'none';
 
         try {
             const result = await Tesseract.recognize(blob, 'eng');
             const rawText = result.data.text;
 
-            // 🌟 魔法淨化器
             let cleanText = rawText;
             cleanText = cleanText.replace(/(\d+)\s*[_\.,]\s*(\d+)/g, "$1.$2");
             cleanText = cleanText.replace(/\d+(?:\.\d+)?\s*%/g, "");
@@ -178,7 +178,6 @@ btnCropConfirm.addEventListener('click', async () => {
 
             let finalSub = 0, finalTax = 0, finalTotal = 0;
 
-            // 🚀 引擎 A：餐點明細加總法
             const splitMatch = cleanText.match(/subtotal|taxable value|net|surtax|\btax\b|vat|total amount|\btotal\b/i);
             if (splitMatch && allAmounts.length > 0) {
                 const upperText = cleanText.substring(0, splitMatch.index);
@@ -195,7 +194,6 @@ btnCropConfirm.addEventListener('click', async () => {
                 }
             }
 
-            // 🚀 引擎 B：A+B=C 數學解謎組合
             if (finalSub === 0) {
                 for (let i = 0; i < allAmounts.length; i++) {
                     for (let j = i + 1; j < allAmounts.length; j++) {
@@ -213,7 +211,6 @@ btnCropConfirm.addEventListener('click', async () => {
                 if (finalTotal) debugMsg += `✅ 引擎 B 成功 (完美配對)！\n\n`;
             }
 
-            // 🛡️ 引擎 C：嚴格同行 Regex 文字鎖定
             if (finalSub === 0) {
                 const subMatch = cleanText.match(/(?:subtotal|taxable value|net)[^\n\r]{0,40}?(\d{1,4}(?:,\d{3})*\.\d{2})/i);
                 const taxMatch = cleanText.match(/(?:surtax|\btax\b|vat)[^\n\r]{0,40}?(\d{1,4}(?:,\d{3})*\.\d{2})/i);
@@ -246,7 +243,6 @@ btnCropConfirm.addEventListener('click', async () => {
                 if (scannedSubtotal === 0 && finalTotal > 0) scannedSubtotal = finalTotal;
                 showDebugAndResultModal(scannedSubtotal.toFixed(2), scannedTax.toFixed(2), debugMsg);
                 
-                // 將掃描到的結果自動填入手動輸入框
                 manualSubtotalInput.value = scannedSubtotal.toFixed(2);
                 manualTaxInput.value = scannedTax.toFixed(2);
                 
@@ -259,7 +255,7 @@ btnCropConfirm.addEventListener('click', async () => {
             console.error("OCR Error:", error);
             showErrorModal('圖片辨識失敗，請重試。');
         } finally {
-            btnSnap.textContent = '📷';
+            btnSnap.innerHTML = '<img src="camera-icon.png" alt="Camera" class="cam-icon-img">';
             btnSnap.style.pointerEvents = 'auto';
             cameraInput.value = ''; 
         }
@@ -283,7 +279,64 @@ btnPlus.addEventListener('click', () => {
     calculateAndRender();
 });
 
-calculateAndRender();
+// 🌟 全新 Web Share 原生分享功能
+btnShare.addEventListener('click', async () => {
+    // 防呆：如果沒有任何金額，不允許分享
+    if (currentGrandTotal === 0) {
+        showErrorModal('目前還沒有帳單資料可以分享喔！');
+        return;
+    }
 
-btnShare.addEventListener('click', () => { showErrorModal('即將加入分享功能！'); });
-btnDone.addEventListener('click', () => { customModal.classList.add('hidden'); });
+    const tipPercentage = parseInt(tipSlider.value); 
+    const tipAmount = (scannedSubtotal * (tipPercentage / 100)).toFixed(2);
+
+    // 組合要送出的文字訊息
+    const shareTitle = '🧾 BillApp 帳單分享';
+    const shareText = 
+`🍽️ 聚餐帳單明細
+
+🔹 稅前 (Subtotal): $${scannedSubtotal.toFixed(2)}
+🔹 稅金 (Tax): $${scannedTax.toFixed(2)}
+🔹 貼士 (Tip ${tipPercentage}%): $${tipAmount}
+💰 總金額 (Total): $${currentGrandTotal.toFixed(2)}
+
+👥 分攤人數: ${currentSplitCount} 人
+👉 每人應付: $${currentPerPerson.toFixed(2)}
+
+(由 BillApp 自動計算 🤖)`;
+
+    // 呼叫 iOS / Android 原生分享介面
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: shareTitle,
+                text: shareText
+            });
+            console.log('分享完成');
+        } catch (error) {
+            console.log('使用者取消分享或發生錯誤:', error);
+        }
+    } else {
+        // 如果是在不支援的舊版瀏覽器（例如非 Safari 桌面版），提供複製到剪貼簿的備案
+        navigator.clipboard.writeText(shareText).then(() => {
+            showErrorModal('已將明細複製到剪貼簿，您可以直接貼上到對話中！');
+        }).catch(err => {
+            showErrorModal('您的裝置不支援原生分享功能。');
+        });
+    }
+});
+
+btnDone.addEventListener('click', () => { 
+    // 重設狀態並清空畫面，準備迎接下一張帳單
+    scannedSubtotal = 0.00;
+    scannedTax = 0.00;
+    manualSubtotalInput.value = '';
+    manualTaxInput.value = '';
+    tipSlider.value = 15;
+    currentSplitCount = 4;
+    splitCountDisplay.textContent = currentSplitCount;
+    calculateAndRender();
+});
+
+// 初始化計算
+calculateAndRender();
