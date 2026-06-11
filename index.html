@@ -24,6 +24,8 @@
     <div class="bubble b-green"></div>
     <div class="bubble b-purple"></div>
 
+    <button class="settings-btn" id="btn-settings">⚙️</button>
+
     <div class="app-container">
         
         <div class="scanner-section">
@@ -57,11 +59,7 @@
                             <label>稅金 (Tax)</label>
                             <input type="number" id="manual-tax" placeholder="$0.00" step="0.01">
                         </div>
-                        <div class="input-row" style="margin-top: 5px; border-top: 1px solid #eee; padding-top: 15px;">
-                            <label>Venmo 帳號</label>
-                            <input type="text" id="venmo-id-input" placeholder="不含 @">
-                        </div>
-                        <button class="update-btn" id="btn-manual-update">更新金額與設定 ✔️</button>
+                        <button class="update-btn" id="btn-manual-update" style="margin-top: 10px;">更新金額 ✔️</button>
                     </div>
                 </div>
             </div>
@@ -120,9 +118,36 @@
     <div id="custom-modal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-icon" id="modal-icon">✅</div>
-            <h3 class="modal-title" id="modal-title">掃描成功！</h3>
+            <h3 class="modal-title" id="modal-title">提示</h3>
             <div class="modal-content" id="modal-content"></div>
             <button class="modal-close-btn" id="modal-close-btn">確認</button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-card" style="padding: 25px 20px;">
+            <div class="modal-icon" style="font-size: 40px; margin-bottom: 5px;">⚙️</div>
+            <h3 class="modal-title" style="margin-bottom: 15px;">個人收款設定</h3>
+            
+            <div class="modal-content" style="gap: 10px;">
+                <div class="input-row" style="background: #f4f7fb; padding: 10px; border-radius: 12px;">
+                    <label style="font-size: 0.9rem;">您的名字</label>
+                    <input type="text" id="settings-name-input" placeholder="例如: Dennis" style="width: 140px; font-size: 14px !important; text-align: left; background: white;">
+                </div>
+                <div class="input-row" style="background: #f4f7fb; padding: 10px; border-radius: 12px;">
+                    <label style="font-size: 0.9rem;">Venmo ID</label>
+                    <input type="text" id="settings-venmo-input" placeholder="不含 @" style="width: 140px; font-size: 14px !important; text-align: left; background: white;">
+                </div>
+                <div class="input-row" style="background: #f4f7fb; padding: 10px; border-radius: 12px;">
+                    <label style="font-size: 0.9rem;">Zelle</label>
+                    <input type="text" id="settings-zelle-input" placeholder="手機或Email" style="width: 140px; font-size: 14px !important; text-align: left; background: white;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button class="modal-close-btn" id="btn-settings-cancel" style="background: #ccc; flex: 1;">取消</button>
+                <button class="modal-close-btn" id="btn-settings-save" style="flex: 1;">儲存設定</button>
+            </div>
         </div>
     </div>
 

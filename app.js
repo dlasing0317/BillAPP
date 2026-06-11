@@ -16,6 +16,15 @@ const modalTitle = document.getElementById('modal-title');
 const modalContent = document.getElementById('modal-content');
 const modalCloseBtn = document.getElementById('modal-close-btn');
 
+// 設定專區元素 (🌟 新增)
+const btnSettings = document.getElementById('btn-settings');
+const settingsModal = document.getElementById('settings-modal');
+const btnSettingsCancel = document.getElementById('btn-settings-cancel');
+const btnSettingsSave = document.getElementById('btn-settings-save');
+const settingsNameInput = document.getElementById('settings-name-input');
+const settingsVenmoInput = document.getElementById('settings-venmo-input');
+const settingsZelleInput = document.getElementById('settings-zelle-input');
+
 // 相機與 OCR 元素
 const btnSnap = document.getElementById('btn-snap');
 const cameraInput = document.getElementById('camera-input');
@@ -34,7 +43,6 @@ const dot2 = document.getElementById('dot-2');
 const btnManualUpdate = document.getElementById('btn-manual-update');
 const manualSubtotalInput = document.getElementById('manual-subtotal');
 const manualTaxInput = document.getElementById('manual-tax');
-const venmoIdInput = document.getElementById('venmo-id-input'); // 🌟 新增的 Venmo ID 輸入框
 
 // 🌟 全域狀態
 let scannedSubtotal = 0.00; 
@@ -44,16 +52,35 @@ let currentGrandTotal = 0.00;
 let currentPerPerson = 0.00;  
 let lastScannedImageFile = null; 
 
-// 🌟 初始化：從瀏覽器記憶中讀取之前存好的 Venmo ID
-const savedVenmo = localStorage.getItem('billapp_venmo_id');
-if (savedVenmo) {
-    venmoIdInput.value = savedVenmo;
-}
-
-// 🌟 當使用者在框框裡打字時，自動偷偷存進瀏覽器記憶
-venmoIdInput.addEventListener('input', (e) => {
-    localStorage.setItem('billapp_venmo_id', e.target.value.trim());
+// ==========================================
+// 🌟 設定檔邏輯 (Settings Logic)
+// ==========================================
+// 點擊齒輪打開設定，載入已儲存的資料
+btnSettings.addEventListener('click', () => {
+    settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
+    settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
+    settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
+    settingsModal.classList.remove('hidden');
 });
+
+// 點擊取消
+btnSettingsCancel.addEventListener('click', () => {
+    settingsModal.classList.add('hidden');
+});
+
+// 點擊儲存
+btnSettingsSave.addEventListener('click', () => {
+    localStorage.setItem('billapp_user_name', settingsNameInput.value.trim());
+    localStorage.setItem('billapp_venmo_id', settingsVenmoInput.value.trim());
+    localStorage.setItem('billapp_zelle_id', settingsZelleInput.value.trim());
+    settingsModal.classList.add('hidden');
+    
+    // 顯示儲存成功提示
+    showErrorModal('✅ 您的個人付款資料已成功儲存！');
+    modalIcon.textContent = '⚙️';
+    modalTitle.textContent = '設定完成';
+});
+
 
 // --- UI 控制邏輯 ---
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
@@ -85,7 +112,7 @@ function showDebugAndResultModal(subtotal, tax, debugText) {
 
 function showErrorModal(message) {
     modalIcon.textContent = '⚠️';
-    modalTitle.textContent = '掃描提示';
+    modalTitle.textContent = '提示';
     modalContent.innerHTML = `<p class="modal-text">${message}</p>`;
     customModal.classList.remove('hidden');
 }
@@ -116,9 +143,6 @@ swipeContainer.addEventListener('scroll', () => {
 btnManualUpdate.addEventListener('click', () => {
     const sub = parseFloat(manualSubtotalInput.value) || 0;
     const tax = parseFloat(manualTaxInput.value) || 0;
-    
-    // 點擊更新時，也確保最新的 Venmo ID 有被存下來
-    localStorage.setItem('billapp_venmo_id', venmoIdInput.value.trim());
 
     if (sub === 0 && tax === 0) {
         showErrorModal('請輸入有效的金額！');
@@ -132,7 +156,7 @@ btnManualUpdate.addEventListener('click', () => {
     
     modalIcon.textContent = '✍️';
     modalTitle.textContent = '手動輸入成功';
-    modalContent.innerHTML = `<p class="modal-text">金額與設定已更新，將為您重新計算每人應付金額。</p>`;
+    modalContent.innerHTML = `<p class="modal-text">金額已更新，將為您重新計算每人應付金額。</p>`;
     customModal.classList.remove('hidden');
 });
 
@@ -301,7 +325,7 @@ btnPlus.addEventListener('click', () => {
     calculateAndRender();
 });
 
-// 🌟 整合動態 Venmo 付款連結的分享功能
+// 🌟 分享功能：帶入全域設定
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
         showErrorModal('目前還沒有帳單資料可以分享喔！');
@@ -311,19 +335,31 @@ btnShare.addEventListener('click', async () => {
     const tipPercentage = parseInt(tipSlider.value); 
     const tipAmount = (scannedSubtotal * (tipPercentage / 100)).toFixed(2);
     
-    // 從輸入框即時抓取使用者設定的 Venmo 帳號
-    const currentVenmoId = venmoIdInput.value.trim();
-    let venmoText = "";
+    // 從 LocalStorage 抓取設定好的帳號與名稱
+    const userName = localStorage.getItem('billapp_user_name') || '我';
+    const currentVenmoId = localStorage.getItem('billapp_venmo_id') || '';
+    const currentZelleId = localStorage.getItem('billapp_zelle_id') || '';
+    
+    let paymentOptionsText = "";
 
-    // 如果使用者有輸入 Venmo 帳號，才加入收款連結
-    if (currentVenmoId) {
-        const venmoLink = `https://venmo.com/?tx=pay&recipients=${currentVenmoId}&amount=${currentPerPerson.toFixed(2)}&note=Dinner%20Bill`;
-        venmoText = `\n💸 點擊下方連結使用 Venmo 快速付款：\n${venmoLink}\n`;
+    // 動態組合付款資訊
+    if (currentVenmoId || currentZelleId) {
+        paymentOptionsText += "\n👇 請選擇付款方式 👇\n";
+        
+        if (currentVenmoId) {
+            const venmoLink = `https://venmo.com/?tx=pay&recipients=${currentVenmoId}&amount=${currentPerPerson.toFixed(2)}&note=Dinner%20Bill`;
+            paymentOptionsText += `\n🔵 點擊使用 Venmo 快速付款:\n${venmoLink}\n`;
+        }
+        
+        if (currentZelleId) {
+            paymentOptionsText += `\n🟣 Zelle 轉帳帳號 (請複製):\n${currentZelleId}\n(請手動輸入金額 $${currentPerPerson.toFixed(2)})\n`;
+        }
     }
 
-    const shareTitle = '🧾 BillApp 帳單分享';
+    // 🌟 將使用者的名字加進標題
+    const shareTitle = `🧾 ${userName} 的聚餐帳單`;
     const shareText = 
-`🍽️ 聚餐帳單明細
+`🍽️ ${userName} 送來了聚餐帳單明細
 
 🔹 稅前 (Subtotal): $${scannedSubtotal.toFixed(2)}
 🔹 稅金 (Tax): $${scannedTax.toFixed(2)}
@@ -332,7 +368,7 @@ btnShare.addEventListener('click', async () => {
 
 👥 分攤人數: ${currentSplitCount} 人
 👉 每人應付: $${currentPerPerson.toFixed(2)}
-${venmoText}
+${paymentOptionsText}
 (由 BillApp 自動計算 🤖)`;
 
     const shareData = {

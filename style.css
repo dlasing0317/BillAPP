@@ -27,10 +27,31 @@ html, body {
 .b-green { width: 100px; height: 100px; background: #bdfcc9; top: 40%; right: 20%; }
 .b-purple { width: 180px; height: 180px; background: #e0c2ff; bottom: -40px; right: -20px; }
 
+/* 🌟 右上角設定按鈕 (已修正為完美透明背景) */
+.settings-btn {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + 15px);
+    right: 20px;
+    font-size: 26px;
+    background: transparent; /* 👈 關鍵修改：將白色背景改為透明 */
+    border: none;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 50;
+    transition: transform 0.1s;
+}
+.settings-btn:active {
+    transform: scale(0.9);
+}
+
 .app-container {
     width: 100%;
     height: 100%;
-    padding: calc(env(safe-area-inset-top) + 10px) 20px calc(env(safe-area-inset-bottom) + 20px);
+    padding: calc(env(safe-area-inset-top) + 60px) 20px calc(env(safe-area-inset-bottom) + 20px);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -38,7 +59,7 @@ html, body {
 }
 
 /* ==========================================
-   🌟 左右滑動區塊 (Swipe Container)
+   左右滑動區塊 (Swipe Container)
 ========================================== */
 .scanner-section {
     display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 10px;
@@ -89,7 +110,7 @@ html, body {
 @keyframes scan { 0% { top: 20%; } 100% { top: 80%; } }
 
 /* ==========================================
-   🌟 乾淨質感的白色圓角矩形相機按鈕
+   乾淨質感的白色圓角矩形相機按鈕
 ========================================== */
 .cam-btn {
     width: 80%; 
@@ -120,7 +141,7 @@ html, body {
 }
 
 /* ==========================================
-   🌟 手動輸入分頁樣式 
+   手動輸入分頁樣式 
 ========================================== */
 .manual-card {
     width: 90%; background: white; border-radius: 24px; padding: 20px;
