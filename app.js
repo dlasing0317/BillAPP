@@ -1,4 +1,11 @@
+// ==========================================
+// ⚙️ 個人付款設定 (請替換成你的 Venmo 帳號，不要加 @)
+// ==========================================
+const VENMO_USERNAME = "YOUR_VENMO_ID"; 
+
+// ==========================================
 // 綁定 UI 元素
+// ==========================================
 const tipSlider = document.getElementById('tip-slider');
 const btnMinus = document.getElementById('btn-minus');
 const btnPlus = document.getElementById('btn-plus');
@@ -39,7 +46,7 @@ let scannedTax = 0.00;
 let currentSplitCount = 4;   
 let currentGrandTotal = 0.00; 
 let currentPerPerson = 0.00;  
-let lastScannedImageFile = null; // 🌟 秘密武器：用來儲存準備分享的收據圖片
+let lastScannedImageFile = null; 
 
 // --- UI 控制邏輯 ---
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
@@ -110,7 +117,7 @@ btnManualUpdate.addEventListener('click', () => {
     
     scannedSubtotal = sub;
     scannedTax = tax;
-    lastScannedImageFile = null; // 若手動更新，清空之前的收據圖片，避免圖文不符
+    lastScannedImageFile = null; 
     calculateAndRender();
     
     modalIcon.textContent = '✍️';
@@ -159,7 +166,6 @@ btnCropConfirm.addEventListener('click', async () => {
         cropModal.classList.add('hidden');
         cropper.destroy();
         
-        // 🌟 將裁切好的圖片存成 File 物件，準備等一下分享用
         lastScannedImageFile = new File([blob], 'receipt_scanned.jpg', { type: 'image/jpeg' });
         
         btnSnap.innerHTML = '<span style="font-size: 28px;">⏳</span>';
@@ -253,7 +259,6 @@ btnCropConfirm.addEventListener('click', async () => {
                 
                 calculateAndRender();
             } else {
-                // 若找不到金額，為了避免混淆，不附帶錯誤圖片
                 lastScannedImageFile = null;
                 showDebugAndResultModal("0.00", "0.00", "❌ 找不到任何金額。\n\n" + debugMsg);
             }
@@ -266,7 +271,7 @@ btnCropConfirm.addEventListener('click', async () => {
             btnSnap.style.pointerEvents = 'auto';
             cameraInput.value = ''; 
         }
-    }, 'image/jpeg'); // 確保輸出的是 JPEG 格式
+    }, 'image/jpeg'); 
 });
 
 // --- 事件監聽器 ---
@@ -286,7 +291,7 @@ btnPlus.addEventListener('click', () => {
     calculateAndRender();
 });
 
-// 🌟 升級版 Web Share：圖文並茂的分享功能
+// 🌟 整合 Venmo 付款連結的分享功能
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
         showErrorModal('目前還沒有帳單資料可以分享喔！');
@@ -295,6 +300,9 @@ btnShare.addEventListener('click', async () => {
 
     const tipPercentage = parseInt(tipSlider.value); 
     const tipAmount = (scannedSubtotal * (tipPercentage / 100)).toFixed(2);
+    
+    // 產生專屬 Venmo 一鍵付款連結
+    const venmoLink = `https://venmo.com/?tx=pay&recipients=${VENMO_USERNAME}&amount=${currentPerPerson.toFixed(2)}&note=Dinner%20Bill`;
 
     const shareTitle = '🧾 BillApp 帳單分享';
     const shareText = 
@@ -308,15 +316,16 @@ btnShare.addEventListener('click', async () => {
 👥 分攤人數: ${currentSplitCount} 人
 👉 每人應付: $${currentPerPerson.toFixed(2)}
 
+💸 點擊下方連結使用 Venmo 快速付款：
+${venmoLink}
+
 (由 BillApp 自動計算 🤖)`;
 
-    // 準備要分享的資料包
     const shareData = {
         title: shareTitle,
         text: shareText
     };
 
-    // 檢查是否有裁切好的圖片，並且檢查瀏覽器是否支援夾帶檔案分享
     if (lastScannedImageFile && navigator.canShare && navigator.canShare({ files: [lastScannedImageFile] })) {
         shareData.files = [lastScannedImageFile];
     }
@@ -329,9 +338,8 @@ btnShare.addEventListener('click', async () => {
             console.log('使用者取消分享或發生錯誤:', error);
         }
     } else {
-        // 退回剪貼簿模式
         navigator.clipboard.writeText(shareText).then(() => {
-            showErrorModal('您的裝置不支援快速分享，已將明細複製到剪貼簿，您可以直接貼上到對話中！');
+            showErrorModal('您的裝置不支援快速分享，已將明細與付款連結複製到剪貼簿！');
         }).catch(err => {
             showErrorModal('分享功能發生錯誤。');
         });
@@ -339,7 +347,6 @@ btnShare.addEventListener('click', async () => {
 });
 
 btnDone.addEventListener('click', () => { 
-    // 重設所有狀態
     scannedSubtotal = 0.00;
     scannedTax = 0.00;
     manualSubtotalInput.value = '';
@@ -347,7 +354,7 @@ btnDone.addEventListener('click', () => {
     tipSlider.value = 15;
     currentSplitCount = 4;
     splitCountDisplay.textContent = currentSplitCount;
-    lastScannedImageFile = null; // 清空上一張收據圖片
+    lastScannedImageFile = null; 
     calculateAndRender();
 });
 
