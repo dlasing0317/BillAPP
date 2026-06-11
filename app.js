@@ -33,12 +33,13 @@ const btnManualUpdate = document.getElementById('btn-manual-update');
 const manualSubtotalInput = document.getElementById('manual-subtotal');
 const manualTaxInput = document.getElementById('manual-tax');
 
-// 初始狀態
+// 🌟 全域狀態
 let scannedSubtotal = 0.00; 
 let scannedTax = 0.00;       
 let currentSplitCount = 4;   
-let currentGrandTotal = 0.00; // 新增全域變數以供分享功能使用
-let currentPerPerson = 0.00;  // 新增全域變數以供分享功能使用
+let currentGrandTotal = 0.00; 
+let currentPerPerson = 0.00;  
+let lastScannedImageFile = null; // 🌟 秘密武器：用來儲存準備分享的收據圖片
 
 // --- UI 控制邏輯 ---
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
@@ -78,8 +79,8 @@ function showErrorModal(message) {
 function calculateAndRender() {
     const tipPercentage = parseInt(tipSlider.value); 
     const tipAmount = scannedSubtotal * (tipPercentage / 100);
-    currentGrandTotal = scannedSubtotal + scannedTax + tipAmount; // 儲存至全域變數
-    currentPerPerson = currentGrandTotal / currentSplitCount;     // 儲存至全域變數
+    currentGrandTotal = scannedSubtotal + scannedTax + tipAmount; 
+    currentPerPerson = currentGrandTotal / currentSplitCount;     
 
     perPersonAmountDisplay.textContent = currentGrandTotal === 0 ? `$0.00` : `$${currentPerPerson.toFixed(2)}`;
 }
@@ -109,6 +110,7 @@ btnManualUpdate.addEventListener('click', () => {
     
     scannedSubtotal = sub;
     scannedTax = tax;
+    lastScannedImageFile = null; // 若手動更新，清空之前的收據圖片，避免圖文不符
     calculateAndRender();
     
     modalIcon.textContent = '✍️';
@@ -156,6 +158,9 @@ btnCropConfirm.addEventListener('click', async () => {
     }).toBlob(async (blob) => {
         cropModal.classList.add('hidden');
         cropper.destroy();
+        
+        // 🌟 將裁切好的圖片存成 File 物件，準備等一下分享用
+        lastScannedImageFile = new File([blob], 'receipt_scanned.jpg', { type: 'image/jpeg' });
         
         btnSnap.innerHTML = '<span style="font-size: 28px;">⏳</span>';
         btnSnap.style.pointerEvents = 'none';
@@ -248,6 +253,8 @@ btnCropConfirm.addEventListener('click', async () => {
                 
                 calculateAndRender();
             } else {
+                // 若找不到金額，為了避免混淆，不附帶錯誤圖片
+                lastScannedImageFile = null;
                 showDebugAndResultModal("0.00", "0.00", "❌ 找不到任何金額。\n\n" + debugMsg);
             }
 
@@ -259,7 +266,7 @@ btnCropConfirm.addEventListener('click', async () => {
             btnSnap.style.pointerEvents = 'auto';
             cameraInput.value = ''; 
         }
-    }, 'image/jpeg');
+    }, 'image/jpeg'); // 確保輸出的是 JPEG 格式
 });
 
 // --- 事件監聽器 ---
@@ -279,9 +286,8 @@ btnPlus.addEventListener('click', () => {
     calculateAndRender();
 });
 
-// 🌟 全新 Web Share 原生分享功能
+// 🌟 升級版 Web Share：圖文並茂的分享功能
 btnShare.addEventListener('click', async () => {
-    // 防呆：如果沒有任何金額，不允許分享
     if (currentGrandTotal === 0) {
         showErrorModal('目前還沒有帳單資料可以分享喔！');
         return;
@@ -290,7 +296,6 @@ btnShare.addEventListener('click', async () => {
     const tipPercentage = parseInt(tipSlider.value); 
     const tipAmount = (scannedSubtotal * (tipPercentage / 100)).toFixed(2);
 
-    // 組合要送出的文字訊息
     const shareTitle = '🧾 BillApp 帳單分享';
     const shareText = 
 `🍽️ 聚餐帳單明細
@@ -305,29 +310,36 @@ btnShare.addEventListener('click', async () => {
 
 (由 BillApp 自動計算 🤖)`;
 
-    // 呼叫 iOS / Android 原生分享介面
+    // 準備要分享的資料包
+    const shareData = {
+        title: shareTitle,
+        text: shareText
+    };
+
+    // 檢查是否有裁切好的圖片，並且檢查瀏覽器是否支援夾帶檔案分享
+    if (lastScannedImageFile && navigator.canShare && navigator.canShare({ files: [lastScannedImageFile] })) {
+        shareData.files = [lastScannedImageFile];
+    }
+
     if (navigator.share) {
         try {
-            await navigator.share({
-                title: shareTitle,
-                text: shareText
-            });
+            await navigator.share(shareData);
             console.log('分享完成');
         } catch (error) {
             console.log('使用者取消分享或發生錯誤:', error);
         }
     } else {
-        // 如果是在不支援的舊版瀏覽器（例如非 Safari 桌面版），提供複製到剪貼簿的備案
+        // 退回剪貼簿模式
         navigator.clipboard.writeText(shareText).then(() => {
-            showErrorModal('已將明細複製到剪貼簿，您可以直接貼上到對話中！');
+            showErrorModal('您的裝置不支援快速分享，已將明細複製到剪貼簿，您可以直接貼上到對話中！');
         }).catch(err => {
-            showErrorModal('您的裝置不支援原生分享功能。');
+            showErrorModal('分享功能發生錯誤。');
         });
     }
 });
 
 btnDone.addEventListener('click', () => { 
-    // 重設狀態並清空畫面，準備迎接下一張帳單
+    // 重設所有狀態
     scannedSubtotal = 0.00;
     scannedTax = 0.00;
     manualSubtotalInput.value = '';
@@ -335,6 +347,7 @@ btnDone.addEventListener('click', () => {
     tipSlider.value = 15;
     currentSplitCount = 4;
     splitCountDisplay.textContent = currentSplitCount;
+    lastScannedImageFile = null; // 清空上一張收據圖片
     calculateAndRender();
 });
 
