@@ -1,6 +1,3 @@
-// ==========================================
-// 🔌 1. 綁定 UI 元素 (清理舊代碼，對齊最新 UI)
-// ==========================================
 const btnSnap = document.getElementById('btn-snap');
 const cameraInput = document.getElementById('camera-input');
 const resultOrb = document.getElementById('result-orb');
@@ -30,26 +27,22 @@ const btnCropCancel = document.getElementById('btn-crop-cancel');
 const btnCropConfirm = document.getElementById('btn-crop-confirm');
 let cropper = null; 
 
-// 🌟 全域狀態 (將滑桿數值獨立出來)
 let scannedSubtotal = 0.00; 
 let scannedTax = 0.00;       
 let currentGrandTotal = 0.00; 
 let currentPerPerson = 0.00;  
 let lastScannedImageFile = null; 
 
-let globalTipValue = 15;
-let globalSplitValue = 4;
+// 🌟 修復點 1：全域變數確實歸位
+let globalTipValue = 5;
+let globalSplitValue = 1;
 
-// ==========================================
-// 🧮 2. 核心計算邏輯
-// ==========================================
 function calculateAndRender() {
     const sub = parseFloat(manualSubtotalInput.value) || 0;
     const tax = parseFloat(manualTaxInput.value) || 0;
     scannedSubtotal = sub;
     scannedTax = tax;
 
-    // 直接使用全域變數，不再依賴已移除的舊滑桿 DOM
     const tipAmount = scannedSubtotal * (globalTipValue / 100);
     currentGrandTotal = scannedSubtotal + scannedTax + tipAmount; 
     currentPerPerson = currentGrandTotal / globalSplitValue;     
@@ -61,65 +54,27 @@ function calculateAndRender() {
 manualSubtotalInput.addEventListener('input', calculateAndRender);
 manualTaxInput.addEventListener('input', calculateAndRender);
 
-// ==========================================
-// 📐 3. 核心魔法：真實環形觸控引擎 (True Circular Touch)
-// ==========================================
-function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min, max, step, initialValue, isPercent, onChangeCallback) {
+function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step, initialValue, isPercent, onChangeCallback) {
     const wrapper = document.getElementById(wrapperId);
     const ring = document.getElementById(ringId);
     const thumb = document.getElementById(thumbId);
     const display = document.getElementById(displayId);
-    const numbersContainer = document.getElementById(numbersId);
 
     let currentValue = initialValue;
-    const r = 38; // 配合 CSS 的半徑
+    const r = 38; 
     const cx = 50;
     const cy = 50;
     const circumference = 2 * Math.PI * r;
 
-    // 建立 270 度的開口弧線
     const arcDegrees = 270;
     const arcLength = circumference * (arcDegrees / 360);
     ring.style.strokeDasharray = `${arcLength} ${circumference}`;
 
-    // A. 動態繪製對齊的外圍數字
-    function generateLabels() {
-        numbersContainer.innerHTML = '';
-        const radius = 95; // 外圍數字的擴張半徑
-        
-        let values = [];
-        if (isPercent) {
-            values = [5, 10, 15, 20, 25, 30];
-        } else {
-            values = [1, 4, 8, 12, 16, 20]; // 避免太擠，人數只標示部分數字
-        }
-
-        values.forEach(val => {
-            const percentage = (val - min) / (max - min);
-            // 視覺角度：從左下 (135度) 畫到 右下 (405度)
-            const visualAngleDeg = 135 + (percentage * arcDegrees);
-            const visualAngleRad = visualAngleDeg * (Math.PI / 180);
-
-            const x = Math.cos(visualAngleRad) * radius;
-            const y = Math.sin(visualAngleRad) * radius;
-
-            const span = document.createElement('span');
-            span.className = 'dial-tick';
-            span.textContent = val + (isPercent ? '%' : '');
-            span.style.left = `calc(50% + ${x}px)`;
-            span.style.top = `calc(50% + ${y}px)`;
-            numbersContainer.appendChild(span);
-        });
-    }
-
-    // B. 更新 UI (光條與發光圓點位置)
     function updateUI(val) {
         const percentage = (val - min) / (max - min);
-        
         const offset = arcLength - (percentage * arcLength);
         ring.style.strokeDashoffset = offset;
 
-        // SVG 內部坐標被 CSS 轉了 135度，所以直接從 0 算到 270度 即可
         const svgAngleRad = (percentage * arcDegrees) * (Math.PI / 180);
         thumb.setAttribute('cx', cx + r * Math.cos(svgAngleRad));
         thumb.setAttribute('cy', cy + r * Math.sin(svgAngleRad));
@@ -128,7 +83,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min
         onChangeCallback(val);
     }
 
-    // C. 處理所有觸控事件 (三角函數運算)
     let isDragging = false;
 
     function handlePointer(e) {
@@ -139,7 +93,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
 
-        // 支援滑鼠 (clientX) 與手機觸控 (touches)
         const clientX = e.clientX || (e.touches && e.touches[0].clientX);
         const clientY = e.clientY || (e.touches && e.touches[0].clientY);
 
@@ -151,20 +104,18 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min
 
         if (angle < 0) angle += 360; 
 
-        // 弧線從 135度開始，把 135度 前的區域推到後方方便計算百分比
         let adjustedAngle = angle;
         if (angle < 135) adjustedAngle += 360;
 
         let percentage = (adjustedAngle - 135) / arcDegrees;
 
-        // 手指滑到下方開口處 (空白區) 時卡住最大/最小值
         if (percentage < 0) { if (adjustedAngle < 135) percentage = 0; }
         if (percentage > 1) { if (adjustedAngle > 135 + arcDegrees) percentage = 1; }
 
         percentage = Math.max(0, Math.min(1, percentage));
 
         let val = min + percentage * (max - min);
-        val = Math.round(val / step) * step; // 根據 step 產生格段吸附感
+        val = Math.round(val / step) * step;
         val = Math.max(min, Math.min(max, val));
 
         if (val !== currentValue) {
@@ -173,7 +124,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min
         }
     }
 
-    // 電腦端 Pointer Events
     wrapper.addEventListener('pointerdown', (e) => {
         isDragging = true;
         handlePointer(e);
@@ -186,7 +136,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min
     });
     wrapper.addEventListener('pointercancel', () => { isDragging = false; });
     
-    // 📱 手機端 Touch Events (雙重防護)
     wrapper.addEventListener('touchstart', (e) => {
         isDragging = true;
         handlePointer(e);
@@ -194,8 +143,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min
     wrapper.addEventListener('touchmove', handlePointer, {passive: false});
     wrapper.addEventListener('touchend', () => { isDragging = false; });
 
-
-    generateLabels();
     updateUI(currentValue);
     
     return {
@@ -203,27 +150,30 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, numbersId, min
     };
 }
 
-// 🚀 初始化兩個環形控制器，並綁定全域變數
+// 🌟 修復點 2：設定傳入的初始值為 5 和 1
 const tipDialControl = setupCircularDial(
-    'tip-wrapper', 'tip-ring', 'tip-thumb', 'tip-display', 'tip-numbers',
-    5, 30, 5, 15, true,
+    'tip-wrapper', 'tip-ring', 'tip-thumb', 'tip-display',
+    5, 30, 5, 5, true,
     (val) => { globalTipValue = val; calculateAndRender(); }
 );
 
 const splitDialControl = setupCircularDial(
-    'split-wrapper', 'split-ring', 'split-thumb', 'split-display', 'split-numbers',
-    1, 20, 1, 4, false,
+    'split-wrapper', 'split-ring', 'split-thumb', 'split-display',
+    1, 20, 1, 1, false,
     (val) => { globalSplitValue = val; calculateAndRender(); }
 );
 
-// ==========================================
-// 4. 其他功能 (相機、設定、分享)
-// ==========================================
+
 settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
 settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
 settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
 
-btnSettings.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+btnSettings.addEventListener('click', () => {
+    settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
+    settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
+    settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
+    settingsModal.classList.remove('hidden');
+});
 btnSettingsCancel.addEventListener('click', () => settingsModal.classList.add('hidden'));
 
 btnSettingsSave.addEventListener('click', () => {
@@ -241,6 +191,7 @@ function showNoticeModal(icon, title, text) {
     customModal.classList.remove('hidden');
 }
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
+
 
 btnSnap.addEventListener('click', () => cameraInput.click());
 btnCropCancel.addEventListener('click', () => {
@@ -402,10 +353,9 @@ btnDone.addEventListener('click', () => {
     manualTaxInput.value = '';
     lastScannedImageFile = null; 
     
-    // 重置旋鈕
-    tipDialControl.setValue(15);
-    splitDialControl.setValue(4);
+    // 🌟 修復點 3：點擊完成結帳後，確實重置為 5 和 1
+    tipDialControl.setValue(5);
+    splitDialControl.setValue(1);
 });
 
-// 啟動畫面時執行一次計算
 calculateAndRender();
