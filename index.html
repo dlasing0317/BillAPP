@@ -9,10 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>BillAPP - Pro Functional</title>
+    <title>BillAPP - True Circular Touch</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=8.0">
+    <link rel="stylesheet" href="style.css?v=9.0">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -24,7 +24,7 @@
         
         <div class="top-section">
             <button id="btn-snap" class="aperture-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
                     <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
@@ -37,10 +37,11 @@
         </div>
 
         <div class="dials-row">
-            <div class="dial-container" id="tip-container">
+            
+            <div class="dial-container">
                 <div class="dial-title">Tip %</div>
-                <div class="dial-numbers" id="tip-numbers"></div>
-                <div class="dial-svg-wrapper">
+                <div class="dial-svg-wrapper" id="tip-wrapper">
+                    <div class="dial-numbers" id="tip-numbers"></div>
                     <svg viewBox="0 0 100 100">
                         <circle class="dial-bg" cx="50" cy="50" r="38"></circle>
                         <circle class="dial-progress" id="tip-ring" cx="50" cy="50" r="38"></circle>
@@ -48,13 +49,12 @@
                     </svg>
                     <div class="dial-center-text" id="tip-display">15%</div>
                 </div>
-                <input type="range" class="hidden-slider" id="tip-slider" min="5" max="30" step="5" value="15">
             </div>
 
-            <div class="dial-container" id="split-container">
+            <div class="dial-container">
                 <div class="dial-title">Split Count</div>
-                <div class="dial-numbers" id="split-numbers"></div>
-                <div class="dial-svg-wrapper">
+                <div class="dial-svg-wrapper" id="split-wrapper">
+                    <div class="dial-numbers" id="split-numbers"></div>
                     <svg viewBox="0 0 100 100">
                         <circle class="dial-bg" cx="50" cy="50" r="38"></circle>
                         <circle class="dial-progress" id="split-ring" cx="50" cy="50" r="38"></circle>
@@ -62,8 +62,8 @@
                     </svg>
                     <div class="dial-center-text" id="split-display">4</div>
                 </div>
-                <input type="range" class="hidden-slider" id="split-slider" min="1" max="20" step="1" value="4">
             </div>
+
         </div>
 
         <div class="center-result-section">
@@ -112,16 +112,6 @@
         </div>
     </div>
 
-    <div id="crop-modal" class="modal-overlay hidden">
-        <div class="crop-container">
-            <img id="crop-image" src="" alt="Cropper">
-        </div>
-        <div class="crop-actions">
-            <button class="crop-btn cancel" id="btn-crop-cancel">Cancel</button>
-            <button class="crop-btn confirm" id="btn-crop-confirm">Analyze</button>
-        </div>
-    </div>
-
     <div id="settings-modal" class="modal-overlay hidden">
         <div class="glass-modal-card">
             <h3 class="modal-title" style="margin-bottom: 25px;">Setup Profile</h3>
@@ -146,6 +136,16 @@
         </div>
     </div>
 
+    <div id="crop-modal" class="modal-overlay hidden">
+        <div class="crop-container">
+            <img id="crop-image" src="" alt="Cropper">
+        </div>
+        <div class="crop-actions">
+            <button class="crop-btn cancel" id="btn-crop-cancel">Cancel</button>
+            <button class="crop-btn confirm" id="btn-crop-confirm">Analyze</button>
+        </div>
+    </div>
+
     <div id="custom-modal" class="modal-overlay hidden">
         <div class="glass-modal-card">
             <div class="modal-icon" id="modal-icon">✅</div>
@@ -155,6 +155,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=2.0"></script>
+    <script src="app.js?v=9.0"></script>
 </body>
 </html>
