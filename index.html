@@ -9,10 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>BillAPP - Big Dial & Bug Fix</title>
+    <title>BillAPP - Aligned UI</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=14.0">
+    <link rel="stylesheet" href="style.css?v=16.0">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -83,7 +83,6 @@
 
         <div class="bottom-controls-row">
             <div class="manual-panel">
-                <div class="panel-title">Manual Inputs</div>
                 <div class="glass-box">
                     <div class="input-line">
                         <label>Subtotal</label>
@@ -98,15 +97,21 @@
             </div>
 
             <div class="actions-panel">
-                <button class="action-circle-btn share-btn" id="btn-share">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                    <span>Share</span>
-                </button>
+                <div class="action-wrapper">
+                    <button class="action-circle-btn share-btn" id="btn-share">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                            <polyline points="16 6 12 2 8 6"></polyline>
+                            <line x1="12" y1="2" x2="12" y2="15"></line>
+                        </svg>
+                    </button>
+                </div>
                 
-                <button class="action-circle-btn done-btn" id="btn-done">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Done</span>
-                </button>
+                <div class="action-wrapper">
+                    <button class="action-circle-btn done-btn" id="btn-done">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -154,6 +159,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=14.0"></script>
+    <script src="app.js?v=16.0"></script>
 </body>
 </html>
