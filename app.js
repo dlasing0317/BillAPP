@@ -161,6 +161,7 @@ const splitDialControl = setupCircularDial(
     (val) => { globalSplitValue = val; calculateAndRender(); }
 );
 
+
 settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
 settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
 settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
@@ -188,6 +189,7 @@ function showNoticeModal(icon, title, text) {
     customModal.classList.remove('hidden');
 }
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
+
 
 btnSnap.addEventListener('click', () => cameraInput.click());
 btnCropCancel.addEventListener('click', () => {
@@ -308,7 +310,6 @@ btnCropConfirm.addEventListener('click', async () => {
     }, 'image/jpeg'); 
 });
 
-// 🌟 修復點：防呆！如果總金額是 0，彈出提示視窗而不是默默無反應
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
         showNoticeModal('⚠️', 'Empty Bill', 'Please enter Subtotal or scan a receipt first!');
