@@ -33,7 +33,6 @@ let currentGrandTotal = 0.00;
 let currentPerPerson = 0.00;  
 let lastScannedImageFile = null; 
 
-// 🌟 修復點 1：全域變數確實歸位
 let globalTipValue = 5;
 let globalSplitValue = 1;
 
@@ -104,13 +103,20 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
 
         if (angle < 0) angle += 360; 
 
-        let adjustedAngle = angle;
-        if (angle < 135) adjustedAngle += 360;
-
-        let percentage = (adjustedAngle - 135) / arcDegrees;
-
-        if (percentage < 0) { if (adjustedAngle < 135) percentage = 0; }
-        if (percentage > 1) { if (adjustedAngle > 135 + arcDegrees) percentage = 1; }
+        // 🌟 修正跳轉 Bug：判斷手指是否落入下方的「空白斷層區 (Gap)」，並智慧吸附
+        let percentage;
+        if (angle > 90 && angle < 135) {
+            // 在空白區左半邊，代表越過了最小值，強制吸附於 0%
+            percentage = 0;
+        } else if (angle > 45 && angle <= 90) {
+            // 在空白區右半邊，代表越過了最大值，強制吸附於 100%
+            percentage = 1;
+        } else {
+            // 在正常軌道上 (135度 ~ 360度 ~ 45度)
+            let adjustedAngle = angle;
+            if (angle <= 45) adjustedAngle += 360;
+            percentage = (adjustedAngle - 135) / arcDegrees;
+        }
 
         percentage = Math.max(0, Math.min(1, percentage));
 
@@ -150,7 +156,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
     };
 }
 
-// 🌟 修復點 2：設定傳入的初始值為 5 和 1
 const tipDialControl = setupCircularDial(
     'tip-wrapper', 'tip-ring', 'tip-thumb', 'tip-display',
     5, 30, 5, 5, true,
@@ -353,7 +358,6 @@ btnDone.addEventListener('click', () => {
     manualTaxInput.value = '';
     lastScannedImageFile = null; 
     
-    // 🌟 修復點 3：點擊完成結帳後，確實重置為 5 和 1
     tipDialControl.setValue(5);
     splitDialControl.setValue(1);
 });

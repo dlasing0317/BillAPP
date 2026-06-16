@@ -97,6 +97,9 @@ html, body {
     100% { box-shadow: 0 0 0 0 rgba(125, 211, 252, 0), inset 0 4px 10px rgba(255,255,255,0.2); }
 }
 
+/* ==========================================
+   🎛️ 中上: 放大版控制圓環
+========================================== */
 .dials-row {
     display: flex;
     justify-content: space-around;
@@ -109,7 +112,7 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 170px;
+    width: 190px; /* 🌟 容器變寬 */
 }
 .dial-title {
     font-size: 1rem;
@@ -120,8 +123,8 @@ html, body {
 
 .dial-svg-wrapper {
     position: relative;
-    width: 135px;
-    height: 135px;
+    width: 160px; /* 🌟 圓環放大 20% (135px -> 160px) */
+    height: 160px; /* 🌟 圓環放大 20% */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -151,7 +154,7 @@ html, body {
 }
 
 .dial-center-text {
-    font-size: 2.2rem;
+    font-size: 2.6rem; /* 🌟 數字跟隨圓環放大 (2.2rem -> 2.6rem) */
     font-weight: 700;
     color: var(--text-main);
     z-index: 2;
@@ -183,15 +186,7 @@ html, body {
 .input-line label { color: var(--text-dim); font-size: 0.95rem; }
 .input-line input { background: transparent; border: none; color: var(--text-main); font-size: 1.1rem; font-weight: 600; text-align: right; width: 60px; outline: none; }
 .divider { height: 1px; background: rgba(255,255,255,0.05); width: 100%; }
-
-/* 🌟 右下角動作面板：加寬間距填補原本 Gift Option 的空缺 */
-.actions-panel { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 20px; 
-    margin-left: 20px; 
-}
+.actions-panel { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-left: 20px; }
 .action-circle-btn { width: 65px; height: 65px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; font-weight: 600; color: var(--text-main); transition: transform 0.2s; }
 .action-circle-btn:active { transform: scale(0.9); }
 .share-btn { background: #1E293B; border: 1px solid rgba(255,255,255,0.1); border-top: 1px solid rgba(255,255,255,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
