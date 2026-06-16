@@ -9,10 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>BillAPP - Layout Fixed</title>
+    <title>BillAPP - QA Passed</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=18.0">
+    <link rel="stylesheet" href="style.css?v=23.0">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -44,7 +44,6 @@
         </div>
 
         <div class="dials-row">
-            
             <div class="dial-container">
                 <div class="dial-title">Tip %</div>
                 <div class="dial-svg-wrapper" id="tip-wrapper">
@@ -68,7 +67,6 @@
                     <div class="dial-center-text" id="split-display">1</div>
                 </div>
             </div>
-
         </div>
 
         <div class="center-result-section">
@@ -86,12 +84,18 @@
                 <div class="glass-box">
                     <div class="input-line">
                         <label>Subtotal</label>
-                        <input type="number" id="manual-subtotal" placeholder="$0.00" step="0.01">
+                        <div class="input-with-symbol">
+                            <span>$</span>
+                            <input type="number" id="manual-subtotal" placeholder="0.00" step="0.01">
+                        </div>
                     </div>
                     <div class="divider"></div>
                     <div class="input-line">
-                        <label>Tax</label>
-                        <input type="number" id="manual-tax" placeholder="$0.00" step="0.01">
+                        <label id="tax-label">Tax</label>
+                        <div class="input-with-symbol">
+                            <span>$</span>
+                            <input type="number" id="manual-tax" placeholder="0.00" step="0.01">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,6 +163,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=18.0"></script>
+    <script src="app.js?v=23.0"></script>
 </body>
 </html>

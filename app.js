@@ -6,6 +6,7 @@ const btnShare = document.getElementById('btn-share');
 const btnDone = document.getElementById('btn-done');
 const manualSubtotalInput = document.getElementById('manual-subtotal');
 const manualTaxInput = document.getElementById('manual-tax');
+const taxLabel = document.getElementById('tax-label');
 
 const btnSettings = document.getElementById('btn-settings');
 const settingsModal = document.getElementById('settings-modal');
@@ -16,7 +17,6 @@ const btnSettingsSave = document.getElementById('btn-settings-save');
 const btnSettingsCancel = document.getElementById('btn-settings-cancel');
 
 const customModal = document.getElementById('custom-modal');
-const modalIcon = document.getElementById('modal-icon');
 const modalTitle = document.getElementById('modal-title');
 const modalContent = document.getElementById('modal-content');
 const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -36,22 +36,59 @@ let lastScannedImageFile = null;
 let globalTipValue = 5;
 let globalSplitValue = 1;
 
+function autoResizeInput(input) {
+    let span = document.getElementById('width-measurer');
+    if (!span) {
+        span = document.createElement('span');
+        span.id = 'width-measurer';
+        span.style.cssText = 'position:absolute; visibility:hidden; white-space:pre; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif; font-size:1.1rem; font-weight:600; font-variant-numeric: tabular-nums;';
+        document.body.appendChild(span);
+    }
+    span.textContent = input.value || input.placeholder || "0.00";
+    input.style.width = `${span.offsetWidth + 2}px`;
+}
+
 function calculateAndRender() {
     const sub = parseFloat(manualSubtotalInput.value) || 0;
     const tax = parseFloat(manualTaxInput.value) || 0;
     scannedSubtotal = sub;
     scannedTax = tax;
 
+    if (sub > 0 && tax > 0) {
+        const taxPercent = (tax / sub) * 100;
+        taxLabel.textContent = `Tax (${taxPercent.toFixed(1)}%)`;
+    } else {
+        taxLabel.textContent = 'Tax';
+    }
+
     const tipAmount = scannedSubtotal * (globalTipValue / 100);
     currentGrandTotal = scannedSubtotal + scannedTax + tipAmount; 
     currentPerPerson = currentGrandTotal / globalSplitValue;     
 
-    perPersonAmountDisplay.textContent = currentGrandTotal === 0 ? `$0.00` : `$${currentPerPerson.toFixed(2)}`;
+    const displayStr = currentGrandTotal === 0 ? `$0.00` : `$${currentPerPerson.toFixed(2)}`;
+    perPersonAmountDisplay.textContent = displayStr;
+    
+    const textLen = displayStr.length;
+    if (textLen > 8) {
+        perPersonAmountDisplay.style.fontSize = '2.8rem'; 
+    } else if (textLen > 6) {
+        perPersonAmountDisplay.style.fontSize = '3.5rem'; 
+    } else {
+        perPersonAmountDisplay.style.fontSize = '4.5rem'; 
+    }
+
     currentGrandTotal > 0 ? resultOrb.classList.remove('inactive') : resultOrb.classList.add('inactive');
 }
 
-manualSubtotalInput.addEventListener('input', calculateAndRender);
-manualTaxInput.addEventListener('input', calculateAndRender);
+manualSubtotalInput.addEventListener('input', function() {
+    autoResizeInput(this);
+    calculateAndRender();
+});
+
+manualTaxInput.addEventListener('input', function() {
+    autoResizeInput(this);
+    calculateAndRender();
+});
 
 function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step, initialValue, isPercent, onChangeCallback) {
     const wrapper = document.getElementById(wrapperId);
@@ -161,7 +198,6 @@ const splitDialControl = setupCircularDial(
     (val) => { globalSplitValue = val; calculateAndRender(); }
 );
 
-
 settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
 settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
 settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
@@ -179,17 +215,15 @@ btnSettingsSave.addEventListener('click', () => {
     localStorage.setItem('billapp_venmo_id', settingsVenmoInput.value.trim());
     localStorage.setItem('billapp_zelle_id', settingsZelleInput.value.trim());
     settingsModal.classList.add('hidden');
-    showNoticeModal('✅', 'Profile Saved', 'Your payment details are securely stored.');
+    showNoticeModal('Profile Saved', 'Your payment details are securely stored.');
 });
 
-function showNoticeModal(icon, title, text) {
-    modalIcon.textContent = icon;
+function showNoticeModal(title, text) {
     modalTitle.textContent = title;
     modalContent.innerHTML = `<p style="color: var(--text-dim);">${text}</p>`;
     customModal.classList.remove('hidden');
 }
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
-
 
 btnSnap.addEventListener('click', () => cameraInput.click());
 btnCropCancel.addEventListener('click', () => {
@@ -293,14 +327,17 @@ btnCropConfirm.addEventListener('click', async () => {
                 if (finalSub === 0 && finalTotal > 0) finalSub = finalTotal;
                 manualSubtotalInput.value = Math.abs(parseFloat(finalSub.toFixed(2)));
                 manualTaxInput.value = Math.abs(parseFloat(finalTax.toFixed(2)));
+                
+                autoResizeInput(manualSubtotalInput);
+                autoResizeInput(manualTaxInput);
                 calculateAndRender();
             } else {
                 lastScannedImageFile = null;
-                showNoticeModal('❌', 'No Amount Found', 'Please try cropping closer to the Subtotal and Tax.');
+                showNoticeModal('No Amount Found', 'Please try cropping closer to the Subtotal and Tax.');
             }
 
         } catch (error) {
-            showNoticeModal('⚠️', 'Error', 'Recognition failed. Try again.');
+            showNoticeModal('Error', 'Recognition failed. Try again.');
         } finally {
             btnSnap.innerHTML = originalApertureSVG;
             btnSnap.classList.remove('scanning');
@@ -312,7 +349,7 @@ btnCropConfirm.addEventListener('click', async () => {
 
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
-        showNoticeModal('⚠️', 'Empty Bill', 'Please enter Subtotal or scan a receipt first!');
+        showNoticeModal('Empty Bill', 'Please enter Subtotal or scan a receipt first!');
         return;
     }
     const userName = localStorage.getItem('billapp_user_name') || 'Me';
@@ -344,7 +381,7 @@ btnShare.addEventListener('click', async () => {
         try { await navigator.share(shareData); } catch (e) {}
     } else {
         navigator.clipboard.writeText(shareText).then(() => {
-            showNoticeModal('📋', 'Copied', 'Details copied to clipboard.');
+            showNoticeModal('Copied', 'Details copied to clipboard.');
         });
     }
 });
@@ -352,10 +389,15 @@ btnShare.addEventListener('click', async () => {
 btnDone.addEventListener('click', () => { 
     manualSubtotalInput.value = '';
     manualTaxInput.value = '';
-    lastScannedImageFile = null; 
     
+    autoResizeInput(manualSubtotalInput);
+    autoResizeInput(manualTaxInput);
+    
+    lastScannedImageFile = null; 
     tipDialControl.setValue(5);
     splitDialControl.setValue(1);
 });
 
+autoResizeInput(manualSubtotalInput);
+autoResizeInput(manualTaxInput);
 calculateAndRender();
