@@ -65,7 +65,6 @@ html, body {
     margin-bottom: 20px;
 }
 
-/* 外框維持 160px 不動 */
 .aperture-btn {
     width: 160px;
     height: 160px;
@@ -80,13 +79,7 @@ html, body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     transition: all 0.2s;
 }
-
-/* 🌟 Bug 修復：將 SVG 圖示放大到 150px 充滿圓環，並將線條調細為 1px 以維持精緻感 */
-.aperture-btn svg { 
-    width: 150px; 
-    height: 150px; 
-    stroke-width: 1px; 
-}
+.aperture-btn svg { width: 150px; height: 150px; stroke-width: 1px; }
 
 .aperture-btn:active {
     transform: scale(0.95);
@@ -167,15 +160,21 @@ html, body {
 }
 
 .center-result-section { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 20px; }
+
 .result-orb {
     width: 250px; height: 250px; border-radius: 50%;
     background: radial-gradient(circle at 50% 100%, #151A24 0%, #080A0F 100%);
-    border: 1px solid rgba(125, 211, 252, 0.2); display: flex; justify-content: center; align-items: center;
+    border: 1px solid rgba(125, 211, 252, 0.2); 
+    display: flex; justify-content: center; align-items: center;
     position: relative; overflow: hidden;
-    box-shadow: 0 0 40px rgba(125, 211, 252, 0.15), inset 0 2px 5px rgba(255, 255, 255, 0.2), inset 0 -20px 40px rgba(0, 0, 0, 0.9);
+    box-shadow: 
+        0 0 40px rgba(125, 211, 252, 0.15),
+        inset 0 2px 5px rgba(255, 255, 255, 0.2), 
+        inset 0 -20px 40px rgba(0, 0, 0, 0.9);
     transition: all 0.3s;
 }
 .orb-glare { position: absolute; top: 1%; left: 15%; width: 70%; height: 40%; border-radius: 50%; background: radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.3) 0%, transparent 70%); pointer-events: none; }
+
 .result-orb.inactive { border: 1px solid var(--track-color); background: var(--bg-main); box-shadow: inset 0 2px 5px rgba(255,255,255,0.05), inset 0 -20px 40px rgba(0,0,0,0.8); }
 .result-orb.inactive .orb-glare { opacity: 0.1; }
 .result-orb.inactive .orb-amount { color: var(--text-dim); }
@@ -213,6 +212,7 @@ html, body {
     width: 45px; 
     transition: width 0.1s ease-out;
 }
+.input-with-symbol input::placeholder { color: var(--text-dim); opacity: 1; }
 .input-with-symbol input[type=number]::-webkit-inner-spin-button, 
 .input-with-symbol input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 

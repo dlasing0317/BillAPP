@@ -210,17 +210,23 @@ btnSettings.addEventListener('click', () => {
 });
 btnSettingsCancel.addEventListener('click', () => settingsModal.classList.add('hidden'));
 
+// 🌟 FIX 1: Passed an empty string to remove the subtitle text entirely
 btnSettingsSave.addEventListener('click', () => {
     localStorage.setItem('billapp_user_name', settingsNameInput.value.trim());
     localStorage.setItem('billapp_venmo_id', settingsVenmoInput.value.trim());
     localStorage.setItem('billapp_zelle_id', settingsZelleInput.value.trim());
     settingsModal.classList.add('hidden');
-    showNoticeModal('Profile Saved', 'Your payment details are securely stored.');
+    showNoticeModal('Profile Saved', ''); 
 });
 
+// 🌟 THE FIX: If there is text, show it. If empty string is passed, render a clean spacer instead.
 function showNoticeModal(title, text) {
     modalTitle.textContent = title;
-    modalContent.innerHTML = `<p style="color: var(--text-dim);">${text}</p>`;
+    if (text) {
+        modalContent.innerHTML = `<p style="color: var(--text-dim); margin-bottom: 25px; line-height: 1.5;">${text}</p>`;
+    } else {
+        modalContent.innerHTML = `<div style="height: 25px;"></div>`; 
+    }
     customModal.classList.remove('hidden');
 }
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
@@ -347,9 +353,10 @@ btnCropConfirm.addEventListener('click', async () => {
     }, 'image/jpeg'); 
 });
 
+// 🌟 FIX 2: Passed an empty string to remove the subtitle text entirely
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
-        showNoticeModal('Empty Bill', 'Please enter Subtotal or scan a receipt first!');
+        showNoticeModal('Empty Bill', ''); 
         return;
     }
     const userName = localStorage.getItem('billapp_user_name') || 'Me';
