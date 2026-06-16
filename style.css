@@ -160,21 +160,15 @@ html, body {
 }
 
 .center-result-section { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; margin-bottom: 20px; }
-
 .result-orb {
     width: 250px; height: 250px; border-radius: 50%;
     background: radial-gradient(circle at 50% 100%, #151A24 0%, #080A0F 100%);
-    border: 1px solid rgba(125, 211, 252, 0.2); 
-    display: flex; justify-content: center; align-items: center;
+    border: 1px solid rgba(125, 211, 252, 0.2); display: flex; justify-content: center; align-items: center;
     position: relative; overflow: hidden;
-    box-shadow: 
-        0 0 40px rgba(125, 211, 252, 0.15),
-        inset 0 2px 5px rgba(255, 255, 255, 0.2), 
-        inset 0 -20px 40px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 40px rgba(125, 211, 252, 0.15), inset 0 2px 5px rgba(255, 255, 255, 0.2), inset 0 -20px 40px rgba(0, 0, 0, 0.9);
     transition: all 0.3s;
 }
 .orb-glare { position: absolute; top: 1%; left: 15%; width: 70%; height: 40%; border-radius: 50%; background: radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.3) 0%, transparent 70%); pointer-events: none; }
-
 .result-orb.inactive { border: 1px solid var(--track-color); background: var(--bg-main); box-shadow: inset 0 2px 5px rgba(255,255,255,0.05), inset 0 -20px 40px rgba(0,0,0,0.8); }
 .result-orb.inactive .orb-glare { opacity: 0.1; }
 .result-orb.inactive .orb-amount { color: var(--text-dim); }
@@ -233,9 +227,31 @@ html, body {
 .modal-input-glass input { background: transparent; border: none; color: var(--text-main); font-size: 1.1rem; text-align: right; width: 60%; outline: none; }
 .modal-close-btn { width: 100%; padding: 18px; border-radius: 20px; border: none; background: #E5E7EB; color: #000; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
 .modal-content div[style*="background: #f4f7fb"] { background: #0A0C10 !important; border: 1px solid #2A2E38 !important; border-radius: 12px;}
+
 .crop-container { width: 100%; height: calc(100dvh - 100px); background: #000; display: flex; align-items: center; }
 #crop-image { max-width: 100%; max-height: 100%; }
 .crop-actions { position: absolute; bottom: 0; width: 100%; height: 100px; background: #0F172A; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #1E293B; }
 .crop-btn { padding: 15px 35px; border-radius: 25px; font-weight: bold; border: none; font-size: 1.1rem; cursor: pointer; }
 .crop-btn.cancel { background: #1E293B; color: #fff; }
 .crop-btn.confirm { background: #E5E7EB; color: #000; }
+
+/* 🌟 New styles for the crop hint overlay */
+.crop-hint {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 600;
+    z-index: 10;
+    pointer-events: none; /* Crucial so it doesn't block touch events */
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    letter-spacing: 0.5px;
+}
