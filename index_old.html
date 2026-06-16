@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BillAPP">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <title>BillAPP</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+</head>
+<body>
+    <div class="bubble b-blue"></div>
+    <div class="bubble b-yellow"></div>
+    <div class="bubble b-pink"></div>
+    <div class="bubble b-green"></div>
+    <div class="bubble b-purple"></div>
+
+    <button class="settings-btn" id="btn-settings">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4a86e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+    </button>
+
+    <div class="app-container">
+        
+        <div class="scanner-section">
+            <div class="section-header">
+                <h2 class="section-title">收據輸入</h2>
+                <div class="swipe-dots">
+                    <span class="dot active" id="dot-1"></span>
+                    <span class="dot" id="dot-2"></span>
+                </div>
+            </div>
+            
+            <div class="swipe-container" id="swipe-container">
+                <div class="swipe-slide">
+                    <div class="viewfinder">
+                        <div class="viewfinder-corners"></div>
+                        <div class="receipt-icon">🧾</div>
+                        <div class="scan-line"></div>
+                    </div>
+                    <button class="cam-btn" id="btn-snap">
+                        <img src="camera-icon.png" alt="Camera" class="cam-icon-img">
+                    </button>
+                </div>
+
+                <div class="swipe-slide manual-slide">
+                    <div class="manual-card">
+                        <div class="input-row">
+                            <label>稅前 (Subtotal)</label>
+                            <input type="number" id="manual-subtotal" placeholder="$0.00" step="0.01">
+                        </div>
+                        <div class="input-row">
+                            <label>稅金 (Tax)</label>
+                            <input type="number" id="manual-tax" placeholder="$0.00" step="0.01">
+                        </div>
+                        <button class="update-btn" id="btn-manual-update" style="margin-top: 10px;">更新金額 ✔️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h3 class="control-title">貼士%</h3>
+            
+            <div class="slider-wrapper">
+                <span class="emoji">😡</span>
+                <div class="slider-container">
+                    <input type="range" min="5" max="25" step="5" value="15" id="tip-slider">
+                    <div class="slider-labels">
+                        <span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span>
+                    </div>
+                </div>
+                <span class="emoji">🤩</span>
+            </div>
+
+            <h3 class="control-title mt-4">人數</h3>
+            <div class="counter-pill">
+                <button class="circle-btn" id="btn-minus">−</button>
+                <span class="count-value" id="split-count">4</span>
+                <button class="circle-btn" id="btn-plus">+</button>
+            </div>
+        </div>
+
+        <div class="result-section">
+            <p class="result-label">每人應付:</p>
+            <h1 class="result-amount" id="per-person-amount">$0.00</h1>
+            
+            <div class="action-row">
+                <button class="action-btn" id="btn-share">
+                    <div class="action-icon share-icon">↪️</div> <span>分享</span>
+                </button>
+                <button class="action-btn" id="btn-done">
+                    <div class="action-icon done-icon">✔️</div> <span>完成</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <input type="file" id="camera-input" accept="image/*" style="display: none;">
+
+    <div id="crop-modal" class="modal-overlay hidden" style="background: #000; z-index: 10000;">
+        <div class="crop-container">
+            <img id="crop-image" src="" alt="Cropper">
+        </div>
+        <div class="crop-actions">
+            <button class="crop-btn cancel" id="btn-crop-cancel">取消</button>
+            <button class="crop-btn confirm" id="btn-crop-confirm">✂️ 裁切並分析</button>
+        </div>
+    </div>
+
+    <div id="custom-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-icon" id="modal-icon">✅</div>
+            <h3 class="modal-title" id="modal-title">提示</h3>
+            <div class="modal-content" id="modal-content"></div>
+            <button class="modal-close-btn" id="modal-close-btn">確認</button>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-card" style="padding: 25px 20px;">
+            <div class="modal-icon" style="font-size: 40px; margin-bottom: 5px;">👤</div>
+            <h3 class="modal-title" style="margin-bottom: 15px;">個人收款設定</h3>
+            
+            <div class="modal-content" style="gap: 10px;">
+                <div class="input-row" style="background: #f4f7fb; padding: 10px; border-radius: 12px;">
+                    <label style="font-size: 0.9rem;">您的名字</label>
+                    <input type="text" id="settings-name-input" placeholder="例如: Dennis" style="width: 140px; font-size: 14px !important; text-align: left; background: white;">
+                </div>
+                <div class="input-row" style="background: #f4f7fb; padding: 10px; border-radius: 12px;">
+                    <label style="font-size: 0.9rem;">Venmo ID</label>
+                    <input type="text" id="settings-venmo-input" placeholder="不含 @" style="width: 140px; font-size: 14px !important; text-align: left; background: white;">
+                </div>
+                <div class="input-row" style="background: #f4f7fb; padding: 10px; border-radius: 12px;">
+                    <label style="font-size: 0.9rem;">Zelle</label>
+                    <input type="text" id="settings-zelle-input" placeholder="手機或Email" style="width: 140px; font-size: 14px !important; text-align: left; background: white;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button class="modal-close-btn" id="btn-settings-cancel" style="background: #ccc; flex: 1;">取消</button>
+                <button class="modal-close-btn" id="btn-settings-save" style="flex: 1;">儲存設定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
