@@ -194,6 +194,24 @@ html, body {
 .input-with-symbol { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
 .input-with-symbol span { color: var(--text-dim); font-size: 1.1rem; font-weight: 600;}
 
+/* 🌟 NEW: Bill Title Input Styles */
+#manual-title {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: left;
+    outline: none;
+    padding: 5px 0;
+}
+#manual-title::placeholder {
+    color: var(--text-dim);
+    font-weight: 400;
+    opacity: 0.7;
+}
+
 .input-with-symbol input { 
     background: transparent; 
     border: none; 

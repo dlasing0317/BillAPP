@@ -8,6 +8,9 @@ const manualSubtotalInput = document.getElementById('manual-subtotal');
 const manualTaxInput = document.getElementById('manual-tax');
 const taxLabel = document.getElementById('tax-label');
 
+// 🌟 NEW
+const manualTitleInput = document.getElementById('manual-title'); 
+
 const btnSettings = document.getElementById('btn-settings');
 const settingsModal = document.getElementById('settings-modal');
 const settingsNameInput = document.getElementById('settings-name-input');
@@ -33,7 +36,8 @@ let currentGrandTotal = 0.00;
 let currentPerPerson = 0.00;  
 let lastScannedImageFile = null; 
 
-let globalTipValue = 5;
+// 🌟 Changed to 0
+let globalTipValue = 0;
 let globalSplitValue = 1;
 
 function autoResizeInput(input) {
@@ -186,9 +190,10 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
     };
 }
 
+// 🌟 Changed initial values to 0
 const tipDialControl = setupCircularDial(
     'tip-wrapper', 'tip-ring', 'tip-thumb', 'tip-display',
-    5, 30, 5, 5, true,
+    0, 30, 5, 0, true,
     (val) => { globalTipValue = val; calculateAndRender(); }
 );
 
@@ -354,11 +359,20 @@ btnCropConfirm.addEventListener('click', async () => {
 });
 
 // 🌟 FIX 2: Passed an empty string to remove the subtitle text entirely
+// 🌟 AND Added Title/Date logic
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
         showNoticeModal('Empty Bill', ''); 
         return;
     }
+    
+    // 🌟 Capture Title and Format Date
+    const rawTitle = manualTitleInput.value.trim();
+    const billTitle = rawTitle ? rawTitle : 'a Meal';
+    
+    const dateOpts = { year: 'numeric', month: 'short', day: 'numeric' };
+    const todayStr = new Date().toLocaleDateString('en-US', dateOpts);
+
     const userName = localStorage.getItem('billapp_user_name') || 'Me';
     const currentVenmoId = localStorage.getItem('billapp_venmo_id') || '';
     const currentZelleId = localStorage.getItem('billapp_zelle_id') || '';
@@ -376,8 +390,10 @@ btnShare.addEventListener('click', async () => {
     }
 
     const shareTitle = `${userName}'s Bill`;
+    
+    // 🌟 Updated Share Text
     const shareText = 
-`🍽️ ${userName} shared a bill\n\n🔹 Subtotal: $${scannedSubtotal.toFixed(2)}\n🔹 Tax: $${scannedTax.toFixed(2)}\n🔹 Tip (${globalTipValue}%): $${(scannedSubtotal * (globalTipValue / 100)).toFixed(2)}\n💰 Total: $${currentGrandTotal.toFixed(2)}\n\n👥 Split: ${globalSplitValue} ppl\n👉 Per Person: $${currentPerPerson.toFixed(2)}\n${paymentOptionsText}`;
+`🍽️ ${userName} shared a bill for ${billTitle}\n📅 Date: ${todayStr}\n\n🔹 Subtotal: $${scannedSubtotal.toFixed(2)}\n🔹 Tax: $${scannedTax.toFixed(2)}\n🔹 Tip (${globalTipValue}%): $${(scannedSubtotal * (globalTipValue / 100)).toFixed(2)}\n💰 Total: $${currentGrandTotal.toFixed(2)}\n\n👥 Split: ${globalSplitValue} ppl\n👉 Per Person: $${currentPerPerson.toFixed(2)}\n${paymentOptionsText}`;
 
     const shareData = { title: shareTitle, text: shareText };
     if (lastScannedImageFile && navigator.canShare && navigator.canShare({ files: [lastScannedImageFile] })) {
@@ -396,12 +412,13 @@ btnShare.addEventListener('click', async () => {
 btnDone.addEventListener('click', () => { 
     manualSubtotalInput.value = '';
     manualTaxInput.value = '';
+    manualTitleInput.value = ''; // 🌟 Clear the title
     
     autoResizeInput(manualSubtotalInput);
     autoResizeInput(manualTaxInput);
     
     lastScannedImageFile = null; 
-    tipDialControl.setValue(5);
+    tipDialControl.setValue(0); // 🌟 Reset to 0
     splitDialControl.setValue(1);
 });
 

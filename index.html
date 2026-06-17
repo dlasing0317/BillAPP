@@ -12,7 +12,7 @@
     <title>BillAPP - Targeted Crop Hint</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=28.0">
+    <link rel="stylesheet" href="style.css?v=29.0">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -52,7 +52,8 @@
                         <circle class="dial-progress" id="tip-ring" cx="50" cy="50" r="38"></circle>
                         <circle class="dial-thumb" id="tip-thumb" cx="50" cy="12" r="5"></circle>
                     </svg>
-                    <div class="dial-center-text" id="tip-display">5%</div>
+                    <!-- 🌟 0% Default -->
+                    <div class="dial-center-text" id="tip-display">0%</div>
                 </div>
             </div>
 
@@ -82,6 +83,12 @@
         <div class="bottom-controls-row">
             <div class="manual-panel">
                 <div class="glass-box">
+                    <!-- 🌟 NEW: Optional Bill Title -->
+                    <div class="input-line title-line" style="margin-bottom: 5px;">
+                        <input type="text" id="manual-title" placeholder="Optional: Name of the bill (e.g. McDonald's)">
+                    </div>
+                    <div class="divider"></div>
+
                     <div class="input-line">
                         <label>Subtotal</label>
                         <div class="input-with-symbol">
@@ -164,6 +171,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=28.0"></script>
+    <script src="app.js?v=29.0"></script>
 </body>
 </html>
