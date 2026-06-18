@@ -142,13 +142,21 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
 
         if (angle < 0) angle += 360; 
 
-        let adjustedAngle = angle;
-        if (angle < 135) adjustedAngle += 360;
-
-        let percentage = (adjustedAngle - 135) / arcDegrees;
-
-        if (percentage < 0) { if (adjustedAngle < 135) percentage = 0; }
-        if (percentage > 1) { if (adjustedAngle > 135 + arcDegrees) percentage = 1; }
+        let percentage;
+        
+        // 🌟 V30.5 FIX: Dead Zone Interceptor (防止越界跳去最大值)
+        // 個圓環缺口喺 45度 到 135度 之間，底部正中間係 90度
+        if (angle > 45 && angle < 135) {
+            if (angle < 90) {
+                percentage = 1; // 靠近最大值嗰邊，強行鎖死最大
+            } else {
+                percentage = 0; // 靠近最小值嗰邊，強行鎖死最小
+            }
+        } else {
+            let adjustedAngle = angle;
+            if (angle <= 45) adjustedAngle += 360; // 將右下角映射上去
+            percentage = (adjustedAngle - 135) / arcDegrees;
+        }
 
         percentage = Math.max(0, Math.min(1, percentage));
 
@@ -416,8 +424,6 @@ btnDone.addEventListener('click', (e) => {
     splitDialControl.setValue(1);
 });
 
-// 🌟 V30.4 THE ULTIMATE iOS KEYBOARD FIX
-// 無論你點樣收起鍵盤，只要 Input 一甩 Focus，強行將畫面扯返去 (0,0)
 document.addEventListener('focusout', (e) => {
     if (e.target.tagName === 'INPUT') {
         setTimeout(() => {
