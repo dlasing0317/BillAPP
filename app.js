@@ -8,7 +8,6 @@ const manualSubtotalInput = document.getElementById('manual-subtotal');
 const manualTaxInput = document.getElementById('manual-tax');
 const taxLabel = document.getElementById('tax-label');
 
-// 🌟 NEW
 const manualTitleInput = document.getElementById('manual-title'); 
 
 const btnSettings = document.getElementById('btn-settings');
@@ -36,7 +35,6 @@ let currentGrandTotal = 0.00;
 let currentPerPerson = 0.00;  
 let lastScannedImageFile = null; 
 
-// 🌟 Changed to 0
 let globalTipValue = 0;
 let globalSplitValue = 1;
 
@@ -190,7 +188,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
     };
 }
 
-// 🌟 Changed initial values to 0
 const tipDialControl = setupCircularDial(
     'tip-wrapper', 'tip-ring', 'tip-thumb', 'tip-display',
     0, 30, 5, 0, true,
@@ -215,7 +212,6 @@ btnSettings.addEventListener('click', () => {
 });
 btnSettingsCancel.addEventListener('click', () => settingsModal.classList.add('hidden'));
 
-// 🌟 FIX 1: Passed an empty string to remove the subtitle text entirely
 btnSettingsSave.addEventListener('click', () => {
     localStorage.setItem('billapp_user_name', settingsNameInput.value.trim());
     localStorage.setItem('billapp_venmo_id', settingsVenmoInput.value.trim());
@@ -224,7 +220,6 @@ btnSettingsSave.addEventListener('click', () => {
     showNoticeModal('Profile Saved', ''); 
 });
 
-// 🌟 THE FIX: If there is text, show it. If empty string is passed, render a clean spacer instead.
 function showNoticeModal(title, text) {
     modalTitle.textContent = title;
     if (text) {
@@ -358,15 +353,12 @@ btnCropConfirm.addEventListener('click', async () => {
     }, 'image/jpeg'); 
 });
 
-// 🌟 FIX 2: Passed an empty string to remove the subtitle text entirely
-// 🌟 AND Added Title/Date logic
 btnShare.addEventListener('click', async () => {
     if (currentGrandTotal === 0) {
         showNoticeModal('Empty Bill', ''); 
         return;
     }
     
-    // 🌟 Capture Title and Format Date
     const rawTitle = manualTitleInput.value.trim();
     const billTitle = rawTitle ? rawTitle : 'a Meal';
     
@@ -391,7 +383,6 @@ btnShare.addEventListener('click', async () => {
 
     const shareTitle = `${userName}'s Bill`;
     
-    // 🌟 Updated Share Text
     const shareText = 
 `🍽️ ${userName} shared a bill for ${billTitle}\n📅 Date: ${todayStr}\n\n🔹 Subtotal: $${scannedSubtotal.toFixed(2)}\n🔹 Tax: $${scannedTax.toFixed(2)}\n🔹 Tip (${globalTipValue}%): $${(scannedSubtotal * (globalTipValue / 100)).toFixed(2)}\n💰 Total: $${currentGrandTotal.toFixed(2)}\n\n👥 Split: ${globalSplitValue} ppl\n👉 Per Person: $${currentPerPerson.toFixed(2)}\n${paymentOptionsText}`;
 
@@ -409,16 +400,21 @@ btnShare.addEventListener('click', async () => {
     }
 });
 
-btnDone.addEventListener('click', () => { 
+// 🌟 FIX: 防止 iOS 橡筋效應並強制歸位
+btnDone.addEventListener('click', (e) => { 
+    e.preventDefault(); 
+    document.activeElement.blur(); 
+    setTimeout(() => window.scrollTo(0, 0), 10); 
+
     manualSubtotalInput.value = '';
     manualTaxInput.value = '';
-    manualTitleInput.value = ''; // 🌟 Clear the title
+    manualTitleInput.value = ''; 
     
     autoResizeInput(manualSubtotalInput);
     autoResizeInput(manualTaxInput);
     
     lastScannedImageFile = null; 
-    tipDialControl.setValue(0); // 🌟 Reset to 0
+    tipDialControl.setValue(0); 
     splitDialControl.setValue(1);
 });
 
