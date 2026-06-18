@@ -400,12 +400,10 @@ btnShare.addEventListener('click', async () => {
     }
 });
 
-// 🌟 FIX: 防止 iOS 橡筋效應並強制歸位
 btnDone.addEventListener('click', (e) => { 
     e.preventDefault(); 
     document.activeElement.blur(); 
-    setTimeout(() => window.scrollTo(0, 0), 10); 
-
+    
     manualSubtotalInput.value = '';
     manualTaxInput.value = '';
     manualTitleInput.value = ''; 
@@ -416,6 +414,17 @@ btnDone.addEventListener('click', (e) => {
     lastScannedImageFile = null; 
     tipDialControl.setValue(0); 
     splitDialControl.setValue(1);
+});
+
+// 🌟 V30.4 THE ULTIMATE iOS KEYBOARD FIX
+// 無論你點樣收起鍵盤，只要 Input 一甩 Focus，強行將畫面扯返去 (0,0)
+document.addEventListener('focusout', (e) => {
+    if (e.target.tagName === 'INPUT') {
+        setTimeout(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            document.body.scrollTop = 0;
+        }, 50);
+    }
 });
 
 autoResizeInput(manualSubtotalInput);
