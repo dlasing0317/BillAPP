@@ -90,27 +90,21 @@ function calculateAndRender() {
         autoResizeInput(summaryTotalAmount);
     }
     
+    // 🌟 V30.12 FIX: 調整字體縮放邏輯，配合細咗嘅黑洞
     const textLen = displayStr.length;
     if (textLen > 8) {
-        perPersonAmountDisplay.style.fontSize = '2.8rem'; 
+        perPersonAmountDisplay.style.fontSize = '2.2rem'; 
     } else if (textLen > 6) {
-        perPersonAmountDisplay.style.fontSize = '3.5rem'; 
+        perPersonAmountDisplay.style.fontSize = '2.8rem'; 
     } else {
-        perPersonAmountDisplay.style.fontSize = '4.5rem'; 
+        perPersonAmountDisplay.style.fontSize = '3.8rem'; 
     }
 
     currentGrandTotal > 0 ? resultOrb.classList.remove('inactive') : resultOrb.classList.add('inactive');
 }
 
-manualSubtotalInput.addEventListener('input', function() {
-    autoResizeInput(this);
-    calculateAndRender();
-});
-
-manualTaxInput.addEventListener('input', function() {
-    autoResizeInput(this);
-    calculateAndRender();
-});
+manualSubtotalInput.addEventListener('input', function() { autoResizeInput(this); calculateAndRender(); });
+manualTaxInput.addEventListener('input', function() { autoResizeInput(this); calculateAndRender(); });
 
 function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step, initialValue, isPercent, onChangeCallback) {
     const wrapper = document.getElementById(wrapperId);
@@ -123,7 +117,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
     const cx = 50;
     const cy = 50;
     const circumference = 2 * Math.PI * r;
-
     const arcDegrees = 270;
     const arcLength = circumference * (arcDegrees / 360);
     ring.style.strokeDasharray = `${arcLength} ${circumference}`;
@@ -132,11 +125,9 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
         const percentage = (val - min) / (max - min);
         const offset = arcLength - (percentage * arcLength);
         ring.style.strokeDashoffset = offset;
-
         const svgAngleRad = (percentage * arcDegrees) * (Math.PI / 180);
         thumb.setAttribute('cx', cx + r * Math.cos(svgAngleRad));
         thumb.setAttribute('cy', cy + r * Math.sin(svgAngleRad));
-
         display.textContent = val + (isPercent ? '%' : '');
         onChangeCallback(val);
     }
@@ -146,24 +137,18 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
     function handlePointer(e) {
         if (!isDragging && e.type !== 'pointerdown' && e.type !== 'touchstart') return;
         e.preventDefault(); 
-
         const rect = wrapper.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-
         const clientX = e.clientX || (e.touches && e.touches[0].clientX);
         const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-
         if(clientX === undefined || clientY === undefined) return;
-
         const dx = clientX - centerX;
         const dy = clientY - centerY;
         let angle = Math.atan2(dy, dx) * (180 / Math.PI); 
-
         if (angle < 0) angle += 360; 
 
         let percentage;
-        
         if (angle > 45 && angle < 135) {
             if (angle < 90) { percentage = 1; } else { percentage = 0; }
         } else {
@@ -173,7 +158,6 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
         }
 
         percentage = Math.max(0, Math.min(1, percentage));
-
         let val = min + percentage * (max - min);
         val = Math.round(val / step) * step;
         val = Math.max(min, Math.min(max, val));
@@ -184,22 +168,11 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
         }
     }
 
-    wrapper.addEventListener('pointerdown', (e) => {
-        isDragging = true;
-        handlePointer(e);
-        wrapper.setPointerCapture(e.pointerId);
-    });
+    wrapper.addEventListener('pointerdown', (e) => { isDragging = true; handlePointer(e); wrapper.setPointerCapture(e.pointerId); });
     wrapper.addEventListener('pointermove', handlePointer);
-    wrapper.addEventListener('pointerup', (e) => {
-        isDragging = false;
-        wrapper.releasePointerCapture(e.pointerId);
-    });
+    wrapper.addEventListener('pointerup', (e) => { isDragging = false; wrapper.releasePointerCapture(e.pointerId); });
     wrapper.addEventListener('pointercancel', () => { isDragging = false; });
-    
-    wrapper.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        handlePointer(e);
-    }, {passive: false});
+    wrapper.addEventListener('touchstart', (e) => { isDragging = true; handlePointer(e); }, {passive: false});
     wrapper.addEventListener('touchmove', handlePointer, {passive: false});
     wrapper.addEventListener('touchend', () => { isDragging = false; });
 
