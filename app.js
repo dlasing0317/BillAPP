@@ -342,9 +342,11 @@ btnShare.addEventListener('click', async (e) => {
     const rawTitle = manualTitleInput.value.trim();
     const billTitle = rawTitle ? rawTitle : 'a Meal';
     
+    const now = new Date();
     const dateOpts = { year: 'numeric', month: 'short', day: 'numeric' };
-    const todayStr = new Date().toLocaleDateString('en-US', dateOpts);
-
+    const todayStr = now.toLocaleDateString('en-US', dateOpts);
+    const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    
     const userName = localStorage.getItem('billapp_user_name') || 'Me';
     const currentVenmoId = localStorage.getItem('billapp_venmo_id') || '';
     const currentZelleId = localStorage.getItem('billapp_zelle_id') || '';
@@ -353,7 +355,10 @@ btnShare.addEventListener('click', async (e) => {
     if (currentVenmoId || currentZelleId) {
         paymentOptionsText += "\n👇 Payment Options 👇\n";
         if (currentVenmoId) {
-            const venmoLink = `https://venmo.com/?tx=pay&recipients=${currentVenmoId}&amount=${currentPerPerson.toFixed(2)}&note=Dinner%20Bill`;
+            // 🌟 V30.17 FIX: URL-safe Dynamic Note (Date + Time's Bill)
+            const dynamicNote = `${todayStr} ${timeStr}'s Bill`;
+            const encodedNote = encodeURIComponent(dynamicNote);
+            const venmoLink = `https://venmo.com/?tx=pay&recipients=${currentVenmoId}&amount=${currentPerPerson.toFixed(2)}&note=${encodedNote}`;
             paymentOptionsText += `\n🔵 Venmo Auto-Pay:\n${venmoLink}\n`;
         }
         if (currentZelleId) {
