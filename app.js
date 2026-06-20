@@ -9,8 +9,6 @@ const manualTaxInput = document.getElementById('manual-tax');
 const taxLabel = document.getElementById('tax-label');
 
 const manualTitleInput = document.getElementById('manual-title'); 
-
-// 🌟 NEW V30.6: References for the new display fields
 const summaryTipLabel = document.getElementById('summary-tip-label');
 const summaryTipAmount = document.getElementById('summary-tip-amount');
 const summaryTotalAmount = document.getElementById('summary-total-amount');
@@ -22,6 +20,14 @@ const settingsVenmoInput = document.getElementById('settings-venmo-input');
 const settingsZelleInput = document.getElementById('settings-zelle-input');
 const btnSettingsSave = document.getElementById('btn-settings-save');
 const btnSettingsCancel = document.getElementById('btn-settings-cancel');
+
+// System Diagnostics References
+const btnInfo = document.getElementById('btn-info');
+const infoModal = document.getElementById('info-modal');
+const btnInfoClose = document.getElementById('btn-info-close');
+const debugEnv = document.getElementById('debug-env');
+const debugScreen = document.getElementById('debug-screen');
+const debugUa = document.getElementById('debug-ua');
 
 const customModal = document.getElementById('custom-modal');
 const modalTitle = document.getElementById('modal-title');
@@ -75,7 +81,6 @@ function calculateAndRender() {
     const displayStr = currentGrandTotal === 0 ? `$0.00` : `$${currentPerPerson.toFixed(2)}`;
     perPersonAmountDisplay.textContent = displayStr;
     
-    // 🌟 NEW V30.6: Update the read-only Tip and Total lines
     if (summaryTipLabel && summaryTipAmount && summaryTotalAmount) {
         summaryTipLabel.textContent = `Tip (${globalTipValue}%)`;
         summaryTipAmount.value = tipAmount.toFixed(2);
@@ -160,11 +165,7 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
         let percentage;
         
         if (angle > 45 && angle < 135) {
-            if (angle < 90) {
-                percentage = 1; 
-            } else {
-                percentage = 0; 
-            }
+            if (angle < 90) { percentage = 1; } else { percentage = 0; }
         } else {
             let adjustedAngle = angle;
             if (angle <= 45) adjustedAngle += 360; 
@@ -203,43 +204,55 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
     wrapper.addEventListener('touchend', () => { isDragging = false; });
 
     updateUI(currentValue);
-    
-    return {
-        setValue: (val) => { currentValue = val; updateUI(val); }
-    };
+    return { setValue: (val) => { currentValue = val; updateUI(val); } };
 }
 
-const tipDialControl = setupCircularDial(
-    'tip-wrapper', 'tip-ring', 'tip-thumb', 'tip-display',
-    0, 30, 5, 0, true,
-    (val) => { globalTipValue = val; calculateAndRender(); }
-);
-
-const splitDialControl = setupCircularDial(
-    'split-wrapper', 'split-ring', 'split-thumb', 'split-display',
-    1, 20, 1, 1, false,
-    (val) => { globalSplitValue = val; calculateAndRender(); }
-);
+const tipDialControl = setupCircularDial('tip-wrapper', 'tip-ring', 'tip-thumb', 'tip-display', 0, 30, 5, 0, true, (val) => { globalTipValue = val; calculateAndRender(); });
+const splitDialControl = setupCircularDial('split-wrapper', 'split-ring', 'split-thumb', 'split-display', 1, 20, 1, 1, false, (val) => { globalSplitValue = val; calculateAndRender(); });
 
 settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
 settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
 settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
 
-btnSettings.addEventListener('click', () => {
+btnSettings.addEventListener('click', (e) => {
+    e.preventDefault();
     settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
     settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
     settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
     settingsModal.classList.remove('hidden');
 });
-btnSettingsCancel.addEventListener('click', () => settingsModal.classList.add('hidden'));
+btnSettingsCancel.addEventListener('click', (e) => { e.preventDefault(); settingsModal.classList.add('hidden'); });
 
-btnSettingsSave.addEventListener('click', () => {
+btnSettingsSave.addEventListener('click', (e) => {
+    e.preventDefault();
     localStorage.setItem('billapp_user_name', settingsNameInput.value.trim());
     localStorage.setItem('billapp_venmo_id', settingsVenmoInput.value.trim());
     localStorage.setItem('billapp_zelle_id', settingsZelleInput.value.trim());
     settingsModal.classList.add('hidden');
     showNoticeModal('Profile Saved', ''); 
 });
+
+// 🌟 V30.10 FIX: 雙重綁定 Click 同 TouchStart，防止點擊遺失
+function triggerInfoModal(e) {
+    if(e) e.preventDefault();
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+    debugEnv.textContent = isStandalone ? "📱 PWA Standalone (App)" : "🌐 Standard Browser";
+    debugScreen.textContent = `${window.innerWidth} x ${window.innerHeight} px`;
+    debugUa.textContent = navigator.userAgent;
+    infoModal.classList.remove('hidden');
+}
+
+if (btnInfo && infoModal && btnInfoClose) {
+    btnInfo.addEventListener('click', triggerInfoModal);
+    btnInfo.addEventListener('touchstart', triggerInfoModal, {passive: false});
+
+    const closeInfoModal = (e) => {
+        if(e) e.preventDefault();
+        infoModal.classList.add('hidden');
+    };
+    btnInfoClose.addEventListener('click', closeInfoModal);
+    btnInfoClose.addEventListener('touchstart', closeInfoModal, {passive: false});
+}
 
 function showNoticeModal(title, text) {
     modalTitle.textContent = title;
@@ -253,11 +266,7 @@ function showNoticeModal(title, text) {
 modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
 
 btnSnap.addEventListener('click', () => cameraInput.click());
-btnCropCancel.addEventListener('click', () => {
-    cropModal.classList.add('hidden');
-    if (cropper) cropper.destroy();
-    cameraInput.value = ''; 
-});
+btnCropCancel.addEventListener('click', () => { cropModal.classList.add('hidden'); if (cropper) cropper.destroy(); cameraInput.value = ''; });
 
 cameraInput.addEventListener('change', (event) => {
     const file = event.target.files[0];
@@ -277,16 +286,7 @@ cameraInput.addEventListener('change', (event) => {
     reader.readAsDataURL(file);
 });
 
-const originalApertureSVG = `
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="10"></circle>
-    <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
-    <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
-    <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
-    <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
-    <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
-    <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
-</svg>`;
+const originalApertureSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="14.31" y1="8" x2="20.05" y2="17.94"></line><line x1="9.69" y1="8" x2="21.17" y2="8"></line><line x1="7.38" y1="12" x2="13.12" y2="2.06"></line><line x1="9.69" y1="16" x2="3.95" y2="6.06"></line><line x1="14.31" y1="16" x2="2.83" y2="16"></line><line x1="16.62" y1="12" x2="10.88" y2="21.94"></line></svg>`;
 
 btnCropConfirm.addEventListener('click', async () => {
     if (!cropper) return;
@@ -374,7 +374,8 @@ btnCropConfirm.addEventListener('click', async () => {
     }, 'image/jpeg'); 
 });
 
-btnShare.addEventListener('click', async () => {
+btnShare.addEventListener('click', async (e) => {
+    e.preventDefault();
     if (currentGrandTotal === 0) {
         showNoticeModal('Empty Bill', ''); 
         return;

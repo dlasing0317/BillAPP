@@ -9,10 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>BillAPP - Ultimate Edition</title>
+    <title>BillAPP - V30.10</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=30.6">
+    <link rel="stylesheet" href="style.css?v=30.10">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -22,8 +22,16 @@
 
     <div class="dashboard-container">
         
-        <button class="profile-settings-btn" id="btn-settings">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="profile-settings-btn" id="btn-info" style="left: 15px; right: auto; width: 55px; height: 55px; z-index: 9999; display: flex; justify-content: center; align-items: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+        </button>
+
+        <button class="profile-settings-btn" id="btn-settings" style="width: 55px; height: 55px; z-index: 9999;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
             </svg>
@@ -126,7 +134,7 @@
             <div class="actions-panel">
                 <div class="action-wrapper">
                     <button class="action-circle-btn share-btn" id="btn-share">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
                             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
                             <polyline points="16 6 12 2 8 6"></polyline>
                             <line x1="12" y1="2" x2="12" y2="15"></line>
@@ -136,9 +144,40 @@
                 
                 <div class="action-wrapper">
                     <button class="action-circle-btn done-btn" id="btn-done">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-modal" class="modal-overlay hidden">
+        <div class="glass-modal-card">
+            <h3 class="modal-title" style="margin-bottom: 20px;">System Diagnostics</h3>
+            <div class="modal-content" style="gap: 12px; display: flex; flex-direction: column; width: 100%; text-align: left;">
+                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
+                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">App Version</span>
+                    <span style="font-weight: 600; color: #fff;">V30.10 (Stable)</span>
+                </div>
+                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
+                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Build Date</span>
+                    <span style="font-weight: 500; color: #fff;">2026-06-19</span>
+                </div>
+                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
+                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Environment</span>
+                    <span id="debug-env" style="font-weight: 500; color: #fff;">Detecting...</span>
+                </div>
+                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
+                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Viewport</span>
+                    <span id="debug-screen" style="font-weight: 500; color: #fff;">Detecting...</span>
+                </div>
+                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
+                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">User Agent</span>
+                    <span id="debug-ua" style="font-weight: 400; color: var(--text-dim); font-size: 0.75rem; word-break: break-all; line-height: 1.3;">Detecting...</span>
+                </div>
+            </div>
+            <div style="width: 100%; margin-top: 20px;">
+                <button class="modal-close-btn" id="btn-info-close" style="width: 100%;">Close Panel</button>
             </div>
         </div>
     </div>
@@ -169,7 +208,6 @@
 
     <div id="crop-modal" class="modal-overlay hidden">
         <div class="crop-hint">Crop to include items, Subtotal, Tax & Total</div>
-        
         <div class="crop-container">
             <img id="crop-image" src="" alt="Cropper">
         </div>
@@ -187,6 +225,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=30.6"></script>
+    <script src="app.js?v=30.10"></script>
 </body>
 </html>
