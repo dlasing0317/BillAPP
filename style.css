@@ -23,11 +23,11 @@ button, input, .dial-svg-wrapper, .action-circle-btn, svg {
     touch-action: manipulation !important;
 }
 
+/* 🌟 V30.14 FIX: 絕對唔可以落 position: fixed，否則 Keyboard 一出就永不翻身 */
 html, body {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
     width: 100%;
     height: 100%; 
+    position: relative;
     background-color: var(--bg-main);
     background-image: 
         radial-gradient(circle at 50% 30%, #171E2D 0%, transparent 60%),
@@ -37,47 +37,53 @@ html, body {
     overscroll-behavior: none; 
 }
 
+/* 🌟 V30.14 FIX: 將 Fixed 落喺 Container，並強制使用 100dvh 貼滿實體熒幕 */
 .dashboard-container {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100dvh; 
     display: flex;
     flex-direction: column;
-    /* 🌟 FIX: 上下預留呼吸空間，緊貼 Safe Area */
-    padding: calc(env(safe-area-inset-top) + 2vh) 20px calc(env(safe-area-inset-bottom) + 2vh);
+    align-items: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    /* 上下 padding 由 HTML 裡面嘅 Flex Spacer 負責，動態吸震 */
 }
 
 .profile-settings-btn {
     position: absolute;
     top: calc(env(safe-area-inset-top) + 15px);
-    right: 20px;
     background: transparent;
     border: none;
     color: var(--text-dim);
-    width: 44px;
-    height: 44px;
+    width: 55px;
+    height: 55px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    z-index: 100;
+    z-index: 9999;
     transition: color 0.2s, transform 0.2s;
 }
-
 .profile-settings-btn svg { width: 24px; height: 24px; }
 .profile-settings-btn:active { transform: scale(0.9); color: var(--accent-blue); filter: drop-shadow(0 0 8px var(--accent-glow)); }
+
+/* 🌟 V30.14: 確保主要組件喺拉伸時絕對不會變形 (flex-shrink: 0) */
+.flex-spacer { width: 100%; display: block; }
 
 .top-section {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 2vh; /* 🌟 動態間距 */
-    flex-shrink: 0;
+    flex-shrink: 0; 
 }
 
-/* 🌟 FIX: 動態尺寸，最大 130px，最小 100px */
+/* 黃金比例尺寸：90px */
 .aperture-btn {
-    width: clamp(100px, 15vh, 130px);
-    height: clamp(100px, 15vh, 130px);
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background: linear-gradient(145deg, #1E293B, #0F172A);
     border: 2px solid var(--track-color);
@@ -89,22 +95,16 @@ html, body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     transition: all 0.2s;
 }
-
-.aperture-btn svg {
-    width: 75%;
-    height: 75%;
-    stroke-width: 1px;
-}
-
+.aperture-btn svg { width: 65px; height: 65px; stroke-width: 1px; }
 .aperture-btn:active { transform: scale(0.95); border-color: var(--accent-blue); color: var(--accent-blue); background: linear-gradient(145deg, #0F172A, #1E293B); box-shadow: 0 0 40px var(--accent-glow), inset 0 2px 5px rgba(255,255,255,0.2); }
 .aperture-btn.scanning { color: var(--accent-blue); border-color: var(--accent-blue); animation: pulseScan 1.5s infinite; }
 @keyframes pulseScan { 0% { box-shadow: 0 0 0 0 var(--accent-glow), inset 0 4px 10px rgba(255,255,255,0.2); } 70% { box-shadow: 0 0 0 20px rgba(125, 211, 252, 0), inset 0 4px 10px rgba(255,255,255,0.2); } 100% { box-shadow: 0 0 0 0 rgba(125, 211, 252, 0), inset 0 4px 10px rgba(255,255,255,0.2); } }
 
 .dials-row {
+    width: 100%;
     display: flex;
     justify-content: space-around;
-    align-items: flex-start;
-    padding: 0 10px;
+    align-items: center;
     flex-shrink: 0;
 }
 
@@ -112,14 +112,14 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 150px;
+    width: 130px;
 }
 
-/* 🌟 FIX: 動態尺寸，最大 140px */
+/* 黃金比例尺寸：110px */
 .dial-svg-wrapper {
     position: relative;
-    width: clamp(110px, 16vh, 140px);
-    height: clamp(110px, 16vh, 140px);
+    width: 110px;
+    height: 110px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -137,21 +137,18 @@ html, body {
 .dial-inner-label { font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; margin-bottom: -2px; text-transform: uppercase; }
 .dial-center-text { font-size: 2.2rem; font-weight: 700; color: var(--text-main); }
 
-/* 🌟 THE GOLDEN RATIO FIX 🌟
-   flex-grow: 1 自動填滿中間空間，將底部掣推到最底，並且令黑洞上下間距 100% 絕對相等 */
 .center-result-section {
-    flex-grow: 1;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
+    flex-shrink: 0;
 }
 
-/* 🌟 FIX: 動態尺寸，最大 240px，保證霸氣 */
+/* 黃金比例尺寸：220px */
 .result-orb {
-    width: clamp(200px, 26vh, 240px);
-    height: clamp(200px, 26vh, 240px);
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     background: radial-gradient(circle at 50% 100%, #151A24 0%, #080A0F 100%);
     border: 1px solid rgba(125, 211, 252, 0.2);
@@ -178,7 +175,7 @@ html, body {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 2vh; /* 🌟 確保 Glass Box 同 Buttons 之間有適當距離 */
+    gap: 15px;
     flex-shrink: 0;
 }
 
@@ -209,8 +206,7 @@ html, body {
 .actions-panel { display: flex; flex-direction: row; justify-content: space-around; width: 100%; padding: 0 10px; }
 .action-wrapper { width: 190px; display: flex; justify-content: center; align-items: center; }
 
-/* 🌟 FIX: 按鈕還原 65px 黃金觸控大小 */
-.action-circle-btn { width: 65px; height: 65px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); transition: all 0.2s; background: radial-gradient(circle at 50% 0%, #1A283B 0%, #0F172A 100%); border: 2px solid var(--track-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+.action-circle-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); transition: all 0.2s; background: radial-gradient(circle at 50% 0%, #1A283B 0%, #0F172A 100%); border: 2px solid var(--track-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 .action-circle-btn:active { transform: scale(0.9); border-color: var(--accent-blue); box-shadow: 0 0 20px var(--accent-glow), inset 0 2px 5px rgba(255,255,255,0.2); color: var(--accent-blue); }
 
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.3s; }
