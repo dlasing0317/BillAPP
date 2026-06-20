@@ -9,10 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>BillAPP - Full Screen Symmetric</title>
+    <title>BillAPP - True Native Layout</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=30.14">
+    <link rel="stylesheet" href="style.css?v=30.15">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -22,7 +22,7 @@
 
     <div class="dashboard-container">
         
-        <button class="profile-settings-btn" id="btn-info" style="left: 15px;">
+        <button class="profile-settings-btn" id="btn-info" style="left: 20px; right: auto; z-index: 9999;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -30,14 +30,12 @@
             </svg>
         </button>
 
-        <button class="profile-settings-btn" id="btn-settings" style="right: 15px;">
+        <button class="profile-settings-btn" id="btn-settings" style="z-index: 9999;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
             </svg>
         </button>
-
-        <div class="flex-spacer" style="flex: 0.3; min-height: env(safe-area-inset-top);"></div>
 
         <div class="top-section">
             <button id="btn-snap" class="aperture-btn">
@@ -52,8 +50,6 @@
                 </svg>
             </button>
         </div>
-
-        <div class="flex-spacer" style="flex: 0.7; min-height: 10px;"></div>
 
         <div class="dials-row">
             <div class="dial-container">
@@ -85,8 +81,6 @@
             </div>
         </div>
 
-        <div class="flex-spacer sync-gap" style="flex: 1.5; min-height: 15px;"></div>
-
         <div class="center-result-section">
             <div class="result-orb" id="result-orb">
                 <div class="orb-glare"></div>
@@ -96,8 +90,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="flex-spacer sync-gap" style="flex: 1.5; min-height: 15px;"></div>
 
         <div class="bottom-controls-row">
             <div class="manual-panel">
@@ -160,8 +152,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="flex-spacer" style="flex: 0.3; min-height: env(safe-area-inset-bottom);"></div>
     </div>
 
     <div id="info-modal" class="modal-overlay hidden">
@@ -170,23 +160,11 @@
             <div class="modal-content" style="gap: 12px; display: flex; flex-direction: column; width: 100%; text-align: left;">
                 <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
                     <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">App Version</span>
-                    <span style="font-weight: 600; color: #fff;">V30.14 (Full Screen Core)</span>
-                </div>
-                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
-                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Build Date</span>
-                    <span style="font-weight: 500; color: #fff;">2026-06-19</span>
+                    <span style="font-weight: 600; color: #fff;">V30.15 (Original Balance)</span>
                 </div>
                 <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
                     <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Environment</span>
                     <span id="debug-env" style="font-weight: 500; color: #fff;">Detecting...</span>
-                </div>
-                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
-                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Viewport</span>
-                    <span id="debug-screen" style="font-weight: 500; color: #fff;">Detecting...</span>
-                </div>
-                <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
-                    <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">User Agent</span>
-                    <span id="debug-ua" style="font-weight: 400; color: var(--text-dim); font-size: 0.75rem; word-break: break-all; line-height: 1.3;">Detecting...</span>
                 </div>
             </div>
             <div style="width: 100%; margin-top: 20px;">
@@ -238,6 +216,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=30.14"></script>
+    <script src="app.js?v=30.15"></script>
 </body>
 </html>

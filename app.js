@@ -26,8 +26,6 @@ const btnInfo = document.getElementById('btn-info');
 const infoModal = document.getElementById('info-modal');
 const btnInfoClose = document.getElementById('btn-info-close');
 const debugEnv = document.getElementById('debug-env');
-const debugScreen = document.getElementById('debug-screen');
-const debugUa = document.getElementById('debug-ua');
 
 const customModal = document.getElementById('custom-modal');
 const modalTitle = document.getElementById('modal-title');
@@ -90,15 +88,6 @@ function calculateAndRender() {
         autoResizeInput(summaryTotalAmount);
     }
     
-    const textLen = displayStr.length;
-    if (textLen > 8) {
-        perPersonAmountDisplay.style.fontSize = '2.2rem'; 
-    } else if (textLen > 6) {
-        perPersonAmountDisplay.style.fontSize = '2.8rem'; 
-    } else {
-        perPersonAmountDisplay.style.fontSize = '3.8rem'; 
-    }
-
     currentGrandTotal > 0 ? resultOrb.classList.remove('inactive') : resultOrb.classList.add('inactive');
 }
 
@@ -208,8 +197,6 @@ function triggerInfoModal(e) {
     if(e) e.preventDefault();
     const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
     debugEnv.textContent = isStandalone ? "📱 PWA Standalone (App)" : "🌐 Standard Browser";
-    debugScreen.textContent = `${window.innerWidth} x ${window.innerHeight} px`;
-    debugUa.textContent = navigator.userAgent;
     infoModal.classList.remove('hidden');
 }
 
@@ -409,12 +396,11 @@ btnDone.addEventListener('click', (e) => {
     splitDialControl.setValue(1);
 });
 
-// 🌟 V30.14: Focusout Reset for Keyboard
+// 🌟 V30.15: 確保鍵盤收起時畫面歸位
 document.addEventListener('focusout', (e) => {
     if (e.target.tagName === 'INPUT') {
         setTimeout(() => {
             window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-            document.body.scrollTop = 0;
         }, 50);
     }
 });

@@ -23,11 +23,10 @@ button, input, .dial-svg-wrapper, .action-circle-btn, svg {
     touch-action: manipulation !important;
 }
 
-/* 🌟 V30.14 FIX: 絕對唔可以落 position: fixed，否則 Keyboard 一出就永不翻身 */
+/* 🌟 V30.15 FIX: 還原 V28 穩定架構，杜絕 iOS 底部黑邊與排版偏移 */
 html, body {
     width: 100%;
-    height: 100%; 
-    position: relative;
+    height: 100dvh;
     background-color: var(--bg-main);
     background-image: 
         radial-gradient(circle at 50% 30%, #171E2D 0%, transparent 60%),
@@ -37,53 +36,44 @@ html, body {
     overscroll-behavior: none; 
 }
 
-/* 🌟 V30.14 FIX: 將 Fixed 落喺 Container，並強制使用 100dvh 貼滿實體熒幕 */
+/* 🌟 V30.15 FIX: THE MAGIC IS BACK! 
+   還原 justify-content: space-between 同 Safe Area Padding！ */
 .dashboard-container {
-    position: absolute;
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100dvh; 
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding-left: 20px;
-    padding-right: 20px;
-    /* 上下 padding 由 HTML 裡面嘅 Flex Spacer 負責，動態吸震 */
+    justify-content: space-between; 
+    padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 20px);
 }
 
 .profile-settings-btn {
     position: absolute;
-    top: calc(env(safe-area-inset-top) + 15px);
+    top: calc(env(safe-area-inset-top) + 20px);
     background: transparent;
     border: none;
     color: var(--text-dim);
-    width: 55px;
-    height: 55px;
+    width: 44px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    z-index: 9999;
     transition: color 0.2s, transform 0.2s;
 }
 .profile-settings-btn svg { width: 24px; height: 24px; }
 .profile-settings-btn:active { transform: scale(0.9); color: var(--accent-blue); filter: drop-shadow(0 0 8px var(--accent-glow)); }
 
-/* 🌟 V30.14: 確保主要組件喺拉伸時絕對不會變形 (flex-shrink: 0) */
-.flex-spacer { width: 100%; display: block; }
-
 .top-section {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0; 
 }
 
-/* 黃金比例尺寸：90px */
+/* 🌟 V30.15: 動態縮放 Camera，最大 120px (讓出 40px 高度) */
 .aperture-btn {
-    width: 90px;
-    height: 90px;
+    width: clamp(90px, 12vh, 120px);
+    height: clamp(90px, 12vh, 120px);
     border-radius: 50%;
     background: linear-gradient(145deg, #1E293B, #0F172A);
     border: 2px solid var(--track-color);
@@ -95,7 +85,7 @@ html, body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     transition: all 0.2s;
 }
-.aperture-btn svg { width: 65px; height: 65px; stroke-width: 1px; }
+.aperture-btn svg { width: 65%; height: 65%; stroke-width: 1px; }
 .aperture-btn:active { transform: scale(0.95); border-color: var(--accent-blue); color: var(--accent-blue); background: linear-gradient(145deg, #0F172A, #1E293B); box-shadow: 0 0 40px var(--accent-glow), inset 0 2px 5px rgba(255,255,255,0.2); }
 .aperture-btn.scanning { color: var(--accent-blue); border-color: var(--accent-blue); animation: pulseScan 1.5s infinite; }
 @keyframes pulseScan { 0% { box-shadow: 0 0 0 0 var(--accent-glow), inset 0 4px 10px rgba(255,255,255,0.2); } 70% { box-shadow: 0 0 0 20px rgba(125, 211, 252, 0), inset 0 4px 10px rgba(255,255,255,0.2); } 100% { box-shadow: 0 0 0 0 rgba(125, 211, 252, 0), inset 0 4px 10px rgba(255,255,255,0.2); } }
@@ -105,7 +95,6 @@ html, body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    flex-shrink: 0;
 }
 
 .dial-container {
@@ -115,11 +104,11 @@ html, body {
     width: 130px;
 }
 
-/* 黃金比例尺寸：110px */
+/* 🌟 V30.15: 動態縮放 Dials，最大 130px (讓出 30px 高度) */
 .dial-svg-wrapper {
     position: relative;
-    width: 110px;
-    height: 110px;
+    width: clamp(100px, 14vh, 130px);
+    height: clamp(100px, 14vh, 130px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -142,13 +131,12 @@ html, body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    flex-shrink: 0;
 }
 
-/* 黃金比例尺寸：220px */
+/* 🌟 V30.15: 動態縮放黑洞，最大 230px (讓出 20px 高度) */
 .result-orb {
-    width: 220px;
-    height: 220px;
+    width: clamp(180px, 24vh, 230px);
+    height: clamp(180px, 24vh, 230px);
     border-radius: 50%;
     background: radial-gradient(circle at 50% 100%, #151A24 0%, #080A0F 100%);
     border: 1px solid rgba(125, 211, 252, 0.2);
@@ -168,15 +156,14 @@ html, body {
 
 .orb-content { display: flex; flex-direction: column; align-items: center; z-index: 2; width: 100%;}
 .orb-label { font-size: 0.8rem; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-.orb-amount { font-size: 3.8rem; font-weight: 700; color: var(--text-main); letter-spacing: -1px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: font-size 0.2s ease-out; }
+.orb-amount { font-size: clamp(3rem, 5vh, 4rem); font-weight: 700; color: var(--text-main); letter-spacing: -1px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: font-size 0.2s ease-out; }
 
 .bottom-controls-row {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 15px;
-    flex-shrink: 0;
+    gap: 15px; /* 恢復標準間距 */
 }
 
 .manual-panel { width: 100%; display: flex; flex-direction: column; }
