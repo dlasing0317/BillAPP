@@ -24,8 +24,10 @@ button, input, .dial-svg-wrapper, .action-circle-btn, svg {
 }
 
 html, body {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
     width: 100%;
-    height: 100dvh; 
+    height: 100%; 
     background-color: var(--bg-main);
     background-image: 
         radial-gradient(circle at 50% 30%, #171E2D 0%, transparent 60%),
@@ -36,8 +38,8 @@ html, body {
 }
 
 .dashboard-container {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -135,13 +137,6 @@ html, body {
     width: 190px;
 }
 
-.dial-title {
-    font-size: 1rem;
-    color: var(--text-dim);
-    margin-bottom: 15px;
-    letter-spacing: 0.5px;
-}
-
 .dial-svg-wrapper {
     position: relative;
     width: 160px;
@@ -189,12 +184,29 @@ html, body {
     transition: cx 0.05s linear, cy 0.05s linear;
 }
 
+/* 🌟 V30.11 NEW: Inner container for label and number */
+.dial-inner-content {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.dial-inner-label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: -5px; 
+    text-transform: uppercase;
+}
+
 .dial-center-text {
     font-size: 2.6rem;
     font-weight: 700;
     color: var(--text-main);
-    z-index: 2;
-    pointer-events: none;
 }
 
 .center-result-section {

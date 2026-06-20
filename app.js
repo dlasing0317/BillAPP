@@ -232,7 +232,6 @@ btnSettingsSave.addEventListener('click', (e) => {
     showNoticeModal('Profile Saved', ''); 
 });
 
-// 🌟 V30.10 FIX: 雙重綁定 Click 同 TouchStart，防止點擊遺失
 function triggerInfoModal(e) {
     if(e) e.preventDefault();
     const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;

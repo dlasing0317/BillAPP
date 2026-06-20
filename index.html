@@ -9,10 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>BillAPP - V30.10</title>
+    <title>BillAPP - V30.11</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=30.10">
+    <link rel="stylesheet" href="style.css?v=30.11">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -53,26 +53,30 @@
 
         <div class="dials-row">
             <div class="dial-container">
-                <div class="dial-title">Tip %</div>
                 <div class="dial-svg-wrapper" id="tip-wrapper">
                     <svg viewBox="0 0 100 100">
                         <circle class="dial-bg" cx="50" cy="50" r="38"></circle>
                         <circle class="dial-progress" id="tip-ring" cx="50" cy="50" r="38"></circle>
                         <circle class="dial-thumb" id="tip-thumb" cx="50" cy="12" r="5"></circle>
                     </svg>
-                    <div class="dial-center-text" id="tip-display">0%</div>
+                    <div class="dial-inner-content">
+                        <span class="dial-inner-label">TIP</span>
+                        <div class="dial-center-text" id="tip-display">0%</div>
+                    </div>
                 </div>
             </div>
 
             <div class="dial-container">
-                <div class="dial-title">Split Count</div>
                 <div class="dial-svg-wrapper" id="split-wrapper">
                     <svg viewBox="0 0 100 100">
                         <circle class="dial-bg" cx="50" cy="50" r="38"></circle>
                         <circle class="dial-progress" id="split-ring" cx="50" cy="50" r="38"></circle>
                         <circle class="dial-thumb" id="split-thumb" cx="50" cy="12" r="5"></circle>
                     </svg>
-                    <div class="dial-center-text" id="split-display">1</div>
+                    <div class="dial-inner-content">
+                        <span class="dial-inner-label">SPLIT</span>
+                        <div class="dial-center-text" id="split-display">1</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -157,7 +161,7 @@
             <div class="modal-content" style="gap: 12px; display: flex; flex-direction: column; width: 100%; text-align: left;">
                 <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
                     <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">App Version</span>
-                    <span style="font-weight: 600; color: #fff;">V30.10 (Stable)</span>
+                    <span style="font-weight: 600; color: #fff;">V30.11 (Stable)</span>
                 </div>
                 <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
                     <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Build Date</span>
@@ -225,6 +229,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=30.10"></script>
+    <script src="app.js?v=30.11"></script>
 </body>
 </html>
