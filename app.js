@@ -18,6 +18,7 @@ const settingsModal = document.getElementById('settings-modal');
 const settingsNameInput = document.getElementById('settings-name-input');
 const settingsVenmoInput = document.getElementById('settings-venmo-input');
 const settingsZelleInput = document.getElementById('settings-zelle-input');
+const settingsWechatInput = document.getElementById('settings-wechat-input');
 const btnSettingsSave = document.getElementById('btn-settings-save');
 const btnSettingsCancel = document.getElementById('btn-settings-cancel');
 
@@ -174,12 +175,14 @@ const splitDialControl = setupCircularDial('split-wrapper', 'split-ring', 'split
 settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
 settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
 settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
+if(settingsWechatInput) settingsWechatInput.value = localStorage.getItem('billapp_wechat_id') || '';
 
 btnSettings.addEventListener('click', (e) => {
     e.preventDefault();
     settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
     settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
     settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
+    if(settingsWechatInput) settingsWechatInput.value = localStorage.getItem('billapp_wechat_id') || '';
     settingsModal.classList.remove('hidden');
 });
 btnSettingsCancel.addEventListener('click', (e) => { e.preventDefault(); settingsModal.classList.add('hidden'); });
@@ -189,6 +192,8 @@ btnSettingsSave.addEventListener('click', (e) => {
     localStorage.setItem('billapp_user_name', settingsNameInput.value.trim());
     localStorage.setItem('billapp_venmo_id', settingsVenmoInput.value.trim());
     localStorage.setItem('billapp_zelle_id', settingsZelleInput.value.trim());
+    if(settingsWechatInput) localStorage.setItem('billapp_wechat_id', settingsWechatInput.value.trim());
+    
     settingsModal.classList.add('hidden');
     showNoticeModal('Profile Saved', ''); 
 });
@@ -345,24 +350,39 @@ btnShare.addEventListener('click', async (e) => {
     const now = new Date();
     const dateOpts = { year: 'numeric', month: 'short', day: 'numeric' };
     const todayStr = now.toLocaleDateString('en-US', dateOpts);
-    const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    
+    // 🌟 V30.20: Custom Note Formatting -> "Jun19.2026.19:30pm"
+    const month = now.toLocaleString('en-US', { month: 'short' }); // e.g. Jun
+    const day = now.getDate(); // e.g. 19
+    const year = now.getFullYear(); // e.g. 2026
+    const hours = now.getHours(); // 0-23
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    const noteDateStr = `${month}${day}.${year}.${hours}:${minutes}${ampm}`;
     
     const userName = localStorage.getItem('billapp_user_name') || 'Me';
     const currentVenmoId = localStorage.getItem('billapp_venmo_id') || '';
     const currentZelleId = localStorage.getItem('billapp_zelle_id') || '';
+    const currentWechatId = localStorage.getItem('billapp_wechat_id') || '';
     
     let paymentOptionsText = "";
-    if (currentVenmoId || currentZelleId) {
+    if (currentVenmoId || currentZelleId || currentWechatId) {
         paymentOptionsText += "\n👇 Payment Options 👇\n";
+        
         if (currentVenmoId) {
-            // 🌟 V30.17 FIX: URL-safe Dynamic Note (Date + Time's Bill)
-            const dynamicNote = `${todayStr} ${timeStr}'s Bill`;
+            // 🌟 V30.20: Applying the exact requested format
+            const dynamicNote = `${noteDateStr} ${userName} Bill`;
             const encodedNote = encodeURIComponent(dynamicNote);
             const venmoLink = `https://venmo.com/?tx=pay&recipients=${currentVenmoId}&amount=${currentPerPerson.toFixed(2)}&note=${encodedNote}`;
             paymentOptionsText += `\n🔵 Venmo Auto-Pay:\n${venmoLink}\n`;
         }
+        
         if (currentZelleId) {
             paymentOptionsText += `\n🟣 Zelle (Copy to transfer):\n${currentZelleId}\n(Amount: $${currentPerPerson.toFixed(2)})\n`;
+        }
+        
+        if (currentWechatId) {
+            paymentOptionsText += `\n🟢 WeChat Pay (Copy ID):\n${currentWechatId}\n(Amount: $${currentPerPerson.toFixed(2)})\n`;
         }
     }
 
