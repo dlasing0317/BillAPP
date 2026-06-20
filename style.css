@@ -23,7 +23,6 @@ button, input, .dial-svg-wrapper, .action-circle-btn, svg {
     touch-action: manipulation !important;
 }
 
-/* 🌟 V30.15 FIX: 還原 V28 穩定架構，杜絕 iOS 底部黑邊與排版偏移 */
 html, body {
     width: 100%;
     height: 100dvh;
@@ -36,8 +35,6 @@ html, body {
     overscroll-behavior: none; 
 }
 
-/* 🌟 V30.15 FIX: THE MAGIC IS BACK! 
-   還原 justify-content: space-between 同 Safe Area Padding！ */
 .dashboard-container {
     width: 100%;
     height: 100%;
@@ -47,22 +44,24 @@ html, body {
     padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 20px);
 }
 
-.profile-settings-btn {
+/* 🌟 V30.16 NEW: Cleaned up class for both top buttons */
+.top-corner-btn {
     position: absolute;
     top: calc(env(safe-area-inset-top) + 20px);
     background: transparent;
     border: none;
     color: var(--text-dim);
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    z-index: 9999;
     transition: color 0.2s, transform 0.2s;
 }
-.profile-settings-btn svg { width: 24px; height: 24px; }
-.profile-settings-btn:active { transform: scale(0.9); color: var(--accent-blue); filter: drop-shadow(0 0 8px var(--accent-glow)); }
+.top-corner-btn svg { width: 24px; height: 24px; pointer-events: none; }
+.top-corner-btn:active { transform: scale(0.9); color: var(--accent-blue); filter: drop-shadow(0 0 8px var(--accent-glow)); }
 
 .top-section {
     display: flex;
@@ -70,7 +69,6 @@ html, body {
     align-items: center;
 }
 
-/* 🌟 V30.15: 動態縮放 Camera，最大 120px (讓出 40px 高度) */
 .aperture-btn {
     width: clamp(90px, 12vh, 120px);
     height: clamp(90px, 12vh, 120px);
@@ -104,7 +102,6 @@ html, body {
     width: 130px;
 }
 
-/* 🌟 V30.15: 動態縮放 Dials，最大 130px (讓出 30px 高度) */
 .dial-svg-wrapper {
     position: relative;
     width: clamp(100px, 14vh, 130px);
@@ -133,7 +130,6 @@ html, body {
     width: 100%;
 }
 
-/* 🌟 V30.15: 動態縮放黑洞，最大 230px (讓出 20px 高度) */
 .result-orb {
     width: clamp(180px, 24vh, 230px);
     height: clamp(180px, 24vh, 230px);
@@ -163,7 +159,7 @@ html, body {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 15px; /* 恢復標準間距 */
+    gap: 15px; 
 }
 
 .manual-panel { width: 100%; display: flex; flex-direction: column; }

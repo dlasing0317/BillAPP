@@ -396,7 +396,6 @@ btnDone.addEventListener('click', (e) => {
     splitDialControl.setValue(1);
 });
 
-// 🌟 V30.15: 確保鍵盤收起時畫面歸位
 document.addEventListener('focusout', (e) => {
     if (e.target.tagName === 'INPUT') {
         setTimeout(() => {
