@@ -10,6 +10,11 @@ const taxLabel = document.getElementById('tax-label');
 
 const manualTitleInput = document.getElementById('manual-title'); 
 
+// 🌟 NEW V30.6: References for the new display fields
+const summaryTipLabel = document.getElementById('summary-tip-label');
+const summaryTipAmount = document.getElementById('summary-tip-amount');
+const summaryTotalAmount = document.getElementById('summary-total-amount');
+
 const btnSettings = document.getElementById('btn-settings');
 const settingsModal = document.getElementById('settings-modal');
 const settingsNameInput = document.getElementById('settings-name-input');
@@ -69,6 +74,16 @@ function calculateAndRender() {
 
     const displayStr = currentGrandTotal === 0 ? `$0.00` : `$${currentPerPerson.toFixed(2)}`;
     perPersonAmountDisplay.textContent = displayStr;
+    
+    // 🌟 NEW V30.6: Update the read-only Tip and Total lines
+    if (summaryTipLabel && summaryTipAmount && summaryTotalAmount) {
+        summaryTipLabel.textContent = `Tip (${globalTipValue}%)`;
+        summaryTipAmount.value = tipAmount.toFixed(2);
+        summaryTotalAmount.value = currentGrandTotal.toFixed(2);
+        
+        autoResizeInput(summaryTipAmount);
+        autoResizeInput(summaryTotalAmount);
+    }
     
     const textLen = displayStr.length;
     if (textLen > 8) {
@@ -144,17 +159,15 @@ function setupCircularDial(wrapperId, ringId, thumbId, displayId, min, max, step
 
         let percentage;
         
-        // 🌟 V30.5 FIX: Dead Zone Interceptor (防止越界跳去最大值)
-        // 個圓環缺口喺 45度 到 135度 之間，底部正中間係 90度
         if (angle > 45 && angle < 135) {
             if (angle < 90) {
-                percentage = 1; // 靠近最大值嗰邊，強行鎖死最大
+                percentage = 1; 
             } else {
-                percentage = 0; // 靠近最小值嗰邊，強行鎖死最小
+                percentage = 0; 
             }
         } else {
             let adjustedAngle = angle;
-            if (angle <= 45) adjustedAngle += 360; // 將右下角映射上去
+            if (angle <= 45) adjustedAngle += 360; 
             percentage = (adjustedAngle - 135) / arcDegrees;
         }
 

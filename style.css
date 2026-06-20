@@ -19,12 +19,10 @@
     user-select: none;
 }
 
-/* 🌟 V30.4 FIX: 廢除所有 iOS 雙擊放大/拖拉手勢 */
 button, input, .dial-svg-wrapper, .action-circle-btn, svg {
     touch-action: manipulation !important;
 }
 
-/* 🌟 V30.4 FIX: 解除 Fixed，還原 100dvh，保留防橡筋 */
 html, body {
     width: 100%;
     height: 100dvh; 
