@@ -37,13 +37,13 @@ html, body {
     overscroll-behavior: none; 
 }
 
-/* 🌟 FIX: 取消 space-between，改由內部 flex: 1 撐開空間 */
 .dashboard-container {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
     display: flex;
     flex-direction: column;
-    padding: calc(env(safe-area-inset-top) + 10px) 20px calc(env(safe-area-inset-bottom) + 10px);
+    /* 🌟 FIX: 上下預留呼吸空間，緊貼 Safe Area */
+    padding: calc(env(safe-area-inset-top) + 2vh) 20px calc(env(safe-area-inset-bottom) + 2vh);
 }
 
 .profile-settings-btn {
@@ -70,13 +70,14 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 15px; 
+    margin-bottom: 2vh; /* 🌟 動態間距 */
+    flex-shrink: 0;
 }
 
-/* 🌟 FIX: 縮小大眼仔 (140px -> 110px) 釋放空間 */
+/* 🌟 FIX: 動態尺寸，最大 130px，最小 100px */
 .aperture-btn {
-    width: 110px;
-    height: 110px;
+    width: clamp(100px, 15vh, 130px);
+    height: clamp(100px, 15vh, 130px);
     border-radius: 50%;
     background: linear-gradient(145deg, #1E293B, #0F172A);
     border: 2px solid var(--track-color);
@@ -90,8 +91,8 @@ html, body {
 }
 
 .aperture-btn svg {
-    width: 90px;
-    height: 90px;
+    width: 75%;
+    height: 75%;
     stroke-width: 1px;
 }
 
@@ -104,7 +105,7 @@ html, body {
     justify-content: space-around;
     align-items: flex-start;
     padding: 0 10px;
-    margin-bottom: 0; /* 🌟 空間由 center-result-section 負責推開 */
+    flex-shrink: 0;
 }
 
 .dial-container {
@@ -114,11 +115,11 @@ html, body {
     width: 150px;
 }
 
-/* 🌟 FIX: 縮小圓環 (160px -> 120px) 釋放空間 */
+/* 🌟 FIX: 動態尺寸，最大 140px */
 .dial-svg-wrapper {
     position: relative;
-    width: 120px;
-    height: 120px;
+    width: clamp(110px, 16vh, 140px);
+    height: clamp(110px, 16vh, 140px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -136,20 +137,21 @@ html, body {
 .dial-inner-label { font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; margin-bottom: -2px; text-transform: uppercase; }
 .dial-center-text { font-size: 2.2rem; font-weight: 700; color: var(--text-main); }
 
-/* 🌟 FIX 核心: flex: 1 會令佢自動食盡中間所有高度。配合 justify-content: center，上下間距會完美對稱！ */
+/* 🌟 THE GOLDEN RATIO FIX 🌟
+   flex-grow: 1 自動填滿中間空間，將底部掣推到最底，並且令黑洞上下間距 100% 絕對相等 */
 .center-result-section {
-    flex: 1; 
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 完美垂直置中 */
+    justify-content: center;
     align-items: center;
     width: 100%;
 }
 
-/* 🌟 FIX: 縮小大黑洞 (250px -> 210px) 釋放空間 */
+/* 🌟 FIX: 動態尺寸，最大 240px，保證霸氣 */
 .result-orb {
-    width: 210px;
-    height: 210px;
+    width: clamp(200px, 26vh, 240px);
+    height: clamp(200px, 26vh, 240px);
     border-radius: 50%;
     background: radial-gradient(circle at 50% 100%, #151A24 0%, #080A0F 100%);
     border: 1px solid rgba(125, 211, 252, 0.2);
@@ -176,18 +178,18 @@ html, body {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    gap: 12px;
+    gap: 2vh; /* 🌟 確保 Glass Box 同 Buttons 之間有適當距離 */
+    flex-shrink: 0;
 }
 
 .manual-panel { width: 100%; display: flex; flex-direction: column; }
 
-/* 🌟 FIX: 收緊 Glass Box 內裡 Padding */
 .glass-box {
     background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
     border: 1px solid var(--panel-border); border-top: 1px solid var(--panel-highlight);
     border-radius: 20px;
-    padding: 10px 15px;
-    display: flex; flex-direction: column; gap: 6px;
+    padding: 12px 15px;
+    display: flex; flex-direction: column; gap: 8px;
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 10px 30px var(--panel-shadow);
 }
@@ -207,8 +209,8 @@ html, body {
 .actions-panel { display: flex; flex-direction: row; justify-content: space-around; width: 100%; padding: 0 10px; }
 .action-wrapper { width: 190px; display: flex; justify-content: center; align-items: center; }
 
-/* 🌟 FIX: 輕微縮小底部按鈕 (65px -> 60px) */
-.action-circle-btn { width: 60px; height: 60px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); transition: all 0.2s; background: radial-gradient(circle at 50% 0%, #1A283B 0%, #0F172A 100%); border: 2px solid var(--track-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+/* 🌟 FIX: 按鈕還原 65px 黃金觸控大小 */
+.action-circle-btn { width: 65px; height: 65px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim); transition: all 0.2s; background: radial-gradient(circle at 50% 0%, #1A283B 0%, #0F172A 100%); border: 2px solid var(--track-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
 .action-circle-btn:active { transform: scale(0.9); border-color: var(--accent-blue); box-shadow: 0 0 20px var(--accent-glow), inset 0 2px 5px rgba(255,255,255,0.2); color: var(--accent-blue); }
 
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.3s; }

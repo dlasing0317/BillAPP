@@ -90,7 +90,6 @@ function calculateAndRender() {
         autoResizeInput(summaryTotalAmount);
     }
     
-    // 🌟 V30.12 FIX: 調整字體縮放邏輯，配合細咗嘅黑洞
     const textLen = displayStr.length;
     if (textLen > 8) {
         perPersonAmountDisplay.style.fontSize = '2.2rem'; 
