@@ -19,6 +19,8 @@ const settingsNameInput = document.getElementById('settings-name-input');
 const settingsVenmoInput = document.getElementById('settings-venmo-input');
 const settingsZelleInput = document.getElementById('settings-zelle-input');
 const settingsWechatInput = document.getElementById('settings-wechat-input');
+// 🌟 V30.21: Reference to new PayPal input
+const settingsPaypalInput = document.getElementById('settings-paypal-input');
 const btnSettingsSave = document.getElementById('btn-settings-save');
 const btnSettingsCancel = document.getElementById('btn-settings-cancel');
 
@@ -176,6 +178,8 @@ settingsNameInput.value = localStorage.getItem('billapp_user_name') || '';
 settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
 settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
 if(settingsWechatInput) settingsWechatInput.value = localStorage.getItem('billapp_wechat_id') || '';
+// 🌟 V30.21: Load PayPal ID
+if(settingsPaypalInput) settingsPaypalInput.value = localStorage.getItem('billapp_paypal_id') || '';
 
 btnSettings.addEventListener('click', (e) => {
     e.preventDefault();
@@ -183,6 +187,7 @@ btnSettings.addEventListener('click', (e) => {
     settingsVenmoInput.value = localStorage.getItem('billapp_venmo_id') || '';
     settingsZelleInput.value = localStorage.getItem('billapp_zelle_id') || '';
     if(settingsWechatInput) settingsWechatInput.value = localStorage.getItem('billapp_wechat_id') || '';
+    if(settingsPaypalInput) settingsPaypalInput.value = localStorage.getItem('billapp_paypal_id') || '';
     settingsModal.classList.remove('hidden');
 });
 btnSettingsCancel.addEventListener('click', (e) => { e.preventDefault(); settingsModal.classList.add('hidden'); });
@@ -193,6 +198,7 @@ btnSettingsSave.addEventListener('click', (e) => {
     localStorage.setItem('billapp_venmo_id', settingsVenmoInput.value.trim());
     localStorage.setItem('billapp_zelle_id', settingsZelleInput.value.trim());
     if(settingsWechatInput) localStorage.setItem('billapp_wechat_id', settingsWechatInput.value.trim());
+    if(settingsPaypalInput) localStorage.setItem('billapp_paypal_id', settingsPaypalInput.value.trim());
     
     settingsModal.classList.add('hidden');
     showNoticeModal('Profile Saved', ''); 
@@ -351,11 +357,10 @@ btnShare.addEventListener('click', async (e) => {
     const dateOpts = { year: 'numeric', month: 'short', day: 'numeric' };
     const todayStr = now.toLocaleDateString('en-US', dateOpts);
     
-    // 🌟 V30.20: Custom Note Formatting -> "Jun19.2026.19:30pm"
-    const month = now.toLocaleString('en-US', { month: 'short' }); // e.g. Jun
-    const day = now.getDate(); // e.g. 19
-    const year = now.getFullYear(); // e.g. 2026
-    const hours = now.getHours(); // 0-23
+    const month = now.toLocaleString('en-US', { month: 'short' }); 
+    const day = now.getDate(); 
+    const year = now.getFullYear(); 
+    const hours = now.getHours(); 
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'pm' : 'am';
     const noteDateStr = `${month}${day}.${year}.${hours}:${minutes}${ampm}`;
@@ -364,19 +369,26 @@ btnShare.addEventListener('click', async (e) => {
     const currentVenmoId = localStorage.getItem('billapp_venmo_id') || '';
     const currentZelleId = localStorage.getItem('billapp_zelle_id') || '';
     const currentWechatId = localStorage.getItem('billapp_wechat_id') || '';
+    // 🌟 V30.21: Get PayPal ID
+    const currentPaypalId = localStorage.getItem('billapp_paypal_id') || '';
     
     let paymentOptionsText = "";
-    if (currentVenmoId || currentZelleId || currentWechatId) {
+    if (currentVenmoId || currentZelleId || currentWechatId || currentPaypalId) {
         paymentOptionsText += "\n👇 Payment Options 👇\n";
         
         if (currentVenmoId) {
-            // 🌟 V30.20: Applying the exact requested format
             const dynamicNote = `${noteDateStr} ${userName} Bill`;
             const encodedNote = encodeURIComponent(dynamicNote);
             const venmoLink = `https://venmo.com/?tx=pay&recipients=${currentVenmoId}&amount=${currentPerPerson.toFixed(2)}&note=${encodedNote}`;
             paymentOptionsText += `\n🔵 Venmo Auto-Pay:\n${venmoLink}\n`;
         }
         
+        // 🌟 V30.21: PayPal.Me Link Generation
+        if (currentPaypalId) {
+            const paypalLink = `https://paypal.me/${currentPaypalId}/${currentPerPerson.toFixed(2)}`;
+            paymentOptionsText += `\n🟡 PayPal:\n${paypalLink}\n`;
+        }
+
         if (currentZelleId) {
             paymentOptionsText += `\n🟣 Zelle (Copy to transfer):\n${currentZelleId}\n(Amount: $${currentPerPerson.toFixed(2)})\n`;
         }

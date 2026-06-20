@@ -9,10 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <title>BillAPP - UI Final</title>
+    <title>BillAPP - Global Pay Ready</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="style.css?v=30.16">
+    <link rel="stylesheet" href="style.css?v=30.21">
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
@@ -154,13 +154,14 @@
         </div>
     </div>
 
+    <!-- Modals -->
     <div id="info-modal" class="modal-overlay hidden">
         <div class="glass-modal-card">
             <h3 class="modal-title" style="margin-bottom: 20px;">System Diagnostics</h3>
             <div class="modal-content" style="gap: 12px; display: flex; flex-direction: column; width: 100%; text-align: left;">
                 <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
                     <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">App Version</span>
-                    <span style="font-weight: 600; color: #fff;">V30.16 (UI Final)</span>
+                    <span style="font-weight: 600; color: #fff;">V30.21 (PayPal)</span>
                 </div>
                 <div class="modal-input-glass" style="padding: 12px; background: rgba(0,0,0,0.2);">
                     <span style="color: var(--text-dim); font-size: 0.85rem; display: block;">Environment</span>
@@ -173,8 +174,9 @@
         </div>
     </div>
 
+    <!-- 🌟 V30.21 FIX: Added PayPal Input -->
     <div id="settings-modal" class="modal-overlay hidden">
-        <div class="glass-modal-card">
+        <div class="glass-modal-card" style="max-height: 90vh; overflow-y: auto;">
             <h3 class="modal-title" style="margin-bottom: 25px;">Setup Profile</h3>
             <div class="modal-content" style="gap: 15px; display: flex; flex-direction: column; width: 100%;">
                 <div class="modal-input-glass">
@@ -187,7 +189,15 @@
                 </div>
                 <div class="modal-input-glass">
                     <label>Zelle</label>
-                    <input type="text" id="settings-zelle-input" placeholder="Phone or Email">
+                    <input type="text" id="settings-zelle-input" placeholder="Phone/Email">
+                </div>
+                <div class="modal-input-glass">
+                    <label>WeChat</label>
+                    <input type="text" id="settings-wechat-input" placeholder="WeChat ID">
+                </div>
+                <div class="modal-input-glass">
+                    <label>PayPal</label>
+                    <input type="text" id="settings-paypal-input" placeholder="Username">
                 </div>
             </div>
             <div style="display: flex; gap: 10px; width: 100%; margin-top: 20px;">
@@ -216,6 +226,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=30.16"></script>
+    <script src="app.js?v=30.21"></script>
 </body>
 </html>
