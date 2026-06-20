@@ -44,7 +44,6 @@ html, body {
     padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 20px);
 }
 
-/* 🌟 V30.16 NEW: Cleaned up class for both top buttons */
 .top-corner-btn {
     position: absolute;
     top: calc(env(safe-area-inset-top) + 20px);
@@ -83,7 +82,8 @@ html, body {
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     transition: all 0.2s;
 }
-.aperture-btn svg { width: 65%; height: 65%; stroke-width: 1px; }
+/* 🌟 V30.18 FIX: 放大 Aperture Icon 比例 (65% -> 85%) */
+.aperture-btn svg { width: 85%; height: 85%; stroke-width: 1px; }
 .aperture-btn:active { transform: scale(0.95); border-color: var(--accent-blue); color: var(--accent-blue); background: linear-gradient(145deg, #0F172A, #1E293B); box-shadow: 0 0 40px var(--accent-glow), inset 0 2px 5px rgba(255,255,255,0.2); }
 .aperture-btn.scanning { color: var(--accent-blue); border-color: var(--accent-blue); animation: pulseScan 1.5s infinite; }
 @keyframes pulseScan { 0% { box-shadow: 0 0 0 0 var(--accent-glow), inset 0 4px 10px rgba(255,255,255,0.2); } 70% { box-shadow: 0 0 0 20px rgba(125, 211, 252, 0), inset 0 4px 10px rgba(255,255,255,0.2); } 100% { box-shadow: 0 0 0 0 rgba(125, 211, 252, 0), inset 0 4px 10px rgba(255,255,255,0.2); } }
